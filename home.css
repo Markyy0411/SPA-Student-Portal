@@ -1,0 +1,213 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+ }
+
+ body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+ }
+
+ .BG-imageee {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    background-image: url('bghome.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 100vw;
+    margin: 0;
+    padding: 0;        
+    height: 100vh;
+    position: fixed;
+  }
+
+.menu-checkbox {
+    display: none;
+}
+
+.menu-btn {
+    font-size: 24px;
+    font-weight: bold;
+    color: black;
+    cursor: pointer;
+    padding: 10px 15px;
+    border: 2px solid transparent;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    user-select: none; 
+}
+.menu-btn:hover {
+    color: #008751;
+    border-color: #008751;
+}
+
+
+.Menu-Container {
+    position: relative; 
+    margin-left: auto;  
+    margin-right: 20px; 
+    z-index: 10;
+}
+
+.menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: transparent; 
+    z-index: 5; 
+    display: none; 
+}
+
+.menu-checkbox:checked ~ .menu-overlay {
+    display: block;
+}
+
+.nav-links {
+    position: absolute;
+    top: 50px;     
+    right: 0;
+    background-color: white;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    border-radius: 10px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    list-style: none;
+    z-index: 15;
+    
+    opacity: 0;
+    pointer-events: none;  
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    min-width: 200px;
+}
+
+.nav-links li {
+    margin: 0;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: black !important;
+    font-size: 20px;
+    display: block;
+    padding: 5px 10px;
+    transition: color 0.2s ease;
+}
+
+.nav-links a:hover {
+    color: #008751 !important;
+    background-color: #f4f4f4;
+    border-radius: 5px;
+}
+
+.menu-checkbox:checked ~ .nav-links {
+    opacity: 1;
+    pointer-events: auto; 
+    transform: translateY(0);
+}
+
+.menu-checkbox:checked ~ .menu-btn {
+    background-color: #008751;
+    color: white;
+}
+
+
+nav {
+    width: 100%;
+    margin: auto;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    background-color: transparent;
+    transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s ease, padding 0.4s ease;
+ }
+
+ nav:hover {
+    background-color: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding-top: 2px;
+     backdrop-filter: blur(10px);
+ }
+
+nav ul {
+    display: flex;
+    align-items: center; 
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+ nav ul li {
+    display: inline-block;
+    list-style: none;
+    margin: 0 20px;
+ 
+}  
+
+ nav ul li a {
+    text-decoration: none;
+    color: black;
+    font-size: 22px;
+    transition: 0.4s ease-in-out;
+ }
+
+ nav ul li a:hover {
+    color: #008751;  
+    opacity: 0.7;
+ }
+
+.Logo-Holders {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        justify-content: center;
+        width: auto;
+        height: auto;
+        transition: 0.4s ease-in-out;
+        gap: 10px;
+}
+
+.nav:hover .Logo-Holders {
+    transform: translateY(-4px);
+}
+
+.Logo-Holders img {
+   height: 80px;
+   width: auto;
+}
+
+.School-name {
+    font-size: 20px;
+    font-weight: bold;
+    color: black;
+    margin-left: 10px;
+}
+
+ .Login-portal {
+    display: inline-block;
+    align-items: center;
+    margin-left: 0px;
+    position: absolute;          
+    top: 10%;        
+    transform: translateY(-50%);
+    border: 2px solid green;
+    background-color: white;
+    border-radius: 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    OVERFLOW: hidden;
+    transition: background-color 0.1s ease;
+    flex-shrink: 0;
+ }
