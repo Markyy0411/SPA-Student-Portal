@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Portal</title>
+    <title>Staff Portal</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
         body {
-            background-image: url('bg.jpg');
+            background-image: url('bghome.jpg');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -26,7 +26,7 @@
             padding: 40px;
             box-shadow: 0 8px 32px rgba(0,0,0,0.2);
         }
-        h1 { color: #008751; margin-bottom: 10px; }
+        h1 { color: #10af33; margin-bottom: 10px; }
         .card-grid {
             display: flex;
             gap: 20px;
@@ -40,11 +40,11 @@
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             text-align: center;
-            border-top: 4px solid #008751;
+            border-top: 4px solid #10af33;
             transition: transform 0.3s ease;
         }
         .card:hover { transform: translateY(-5px); }
-        .card i { font-size: 35px; color: #008751; margin-bottom: 15px; }
+        .card i { font-size: 35px; color: #10af33; margin-bottom: 15px; }
         .logout-btn {
             background: #ff4d4d;
             color: white;
@@ -62,24 +62,24 @@
 <body>
     <div class="dashboard-container">
         <button class="logout-btn" onclick="window.location.href='index.html'">Logout</button>
-        <h1><i class="fa-solid fa-graduation-cap"></i> Student Dashboard</h1>
-        <p>Welcome back! Check your progress and latest updates here.</p>
+        <h1><i class="fa-solid fa-chalkboard-user"></i> Staff Dashboard</h1>
+        <p>Welcome, Staff Member. Manage your classes and share updates.</p>
         
         <div class="card-grid">
             <div class="card">
-                <i class="fa-solid fa-star"></i>
-                <h3>My Grades</h3>
-                <p>View your academic performance for the semester.</p>
+                <i class="fa-solid fa-book"></i>
+                <h3>Manage Classes</h3>
+                <p>View your classes, upload grades, and check attendance.</p>
             </div>
             <div class="card">
-                <i class="fa-solid fa-calendar-days"></i>
-                <h3>Schedule</h3>
-                <p>Check your upcoming classes and room numbers.</p>
+                <i class="fa-solid fa-bullhorn"></i>
+                <h3>Post Announcement</h3>
+                <p>Share news and files directly with your students.</p>
             </div>
             <div class="card">
-                <i class="fa-solid fa-bell"></i>
-                <h3>Announcements</h3>
-                <p>Read the latest news from your teachers and admin.</p>
+                <i class="fa-solid fa-comments"></i>
+                <h3>Messages</h3>
+                <p>Communicate with students or admins.</p>
             </div>
         </div>
     </div>

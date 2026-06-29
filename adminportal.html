@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Portal</title>
+    <title>Admin Portal</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
         body {
-            background-image: url('bg.jpg');
+            background-image: url('bghome.jpg');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -62,24 +62,24 @@
 <body>
     <div class="dashboard-container">
         <button class="logout-btn" onclick="window.location.href='index.html'">Logout</button>
-        <h1><i class="fa-solid fa-graduation-cap"></i> Student Dashboard</h1>
-        <p>Welcome back! Check your progress and latest updates here.</p>
+        <h1><i class="fa-solid fa-user-shield"></i> Admin Dashboard</h1>
+        <p>Welcome, Administrator. You have full system access.</p>
         
         <div class="card-grid">
             <div class="card">
-                <i class="fa-solid fa-star"></i>
-                <h3>My Grades</h3>
-                <p>View your academic performance for the semester.</p>
+                <i class="fa-solid fa-users"></i>
+                <h3>Manage Users</h3>
+                <p>Add, remove, or edit students and staff accounts.</p>
             </div>
             <div class="card">
-                <i class="fa-solid fa-calendar-days"></i>
-                <h3>Schedule</h3>
-                <p>Check your upcoming classes and room numbers.</p>
+                <i class="fa-solid fa-bullhorn"></i>
+                <h3>Global Announcements</h3>
+                <p>Post important announcements to all portals.</p>
             </div>
             <div class="card">
-                <i class="fa-solid fa-bell"></i>
-                <h3>Announcements</h3>
-                <p>Read the latest news from your teachers and admin.</p>
+                <i class="fa-solid fa-cogs"></i>
+                <h3>System Settings</h3>
+                <p>Configure portal options and database security.</p>
             </div>
         </div>
     </div>
