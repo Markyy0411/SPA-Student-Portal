@@ -331,8 +331,8 @@
                 
                 if (result.status === 'success') {
                     result.data.forEach(user => {
-                        // Skip empty rows from the spreadsheet
-                        if (!user.student_id) return;
+                        // Skip empty rows and non-student roles
+                        if (!user.student_id || user.role !== 'student') return;
 
                         const tr = document.createElement('tr');
                         tr.innerHTML = `
