@@ -75,21 +75,73 @@
             padding: 30px;
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            max-width: 500px;
+            max-width: 600px;
             margin-top: 20px;
             border-left: 5px solid #008751;
         }
         .profile-row {
             display: flex;
             justify-content: space-between;
-            padding: 15px 0;
+            padding: 12px 0;
             border-bottom: 1px solid #eee;
-            font-size: 18px;
+            font-size: 16px;
         }
         .profile-row:last-child { border-bottom: none; }
         .profile-label { color: #666; font-weight: 500; }
-        .profile-value { font-weight: 600; color: #333; }
-        .balance-value { color: #008751; font-size: 24px; }
+        .profile-value { font-weight: 600; color: #333; text-align: right; }
+        .balance-value { color: #008751; font-size: 22px; }
+
+        /* Announcement Feed Styles */
+        .feed-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .announcement-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 5px solid #10af33;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .announcement-meta {
+            font-size: 13px;
+            color: #777;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        .announcement-text {
+            font-size: 16px;
+            line-height: 1.5;
+            color: #333;
+        }
+
+        /* Schedule Table */
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            margin-top: 20px;
+        }
+        .schedule-table th, .schedule-table td {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+            border-right: 1px solid #eee;
+        }
+        .schedule-table th {
+            background-color: #008751;
+            color: white;
+            font-weight: 600;
+        }
+        .schedule-table td:last-child, .schedule-table th:last-child { border-right: none; }
+        .time-col { font-weight: 600; background: #f9f9f9; color: #555; }
+        .class-slot { background: #e8f5e9; color: #1b5e20; font-weight: 600; border-radius: 4px; }
+        .break-slot { background: #fff3e0; color: #e65100; font-weight: 600; }
     </style>
 </head>
 <body>
@@ -103,19 +155,19 @@
             
             <div class="card-grid">
                 <div class="card" onclick="showView('profile-view'); populateProfile();">
-                    <i class="fa-solid fa-wallet"></i>
+                    <i class="fa-solid fa-id-card"></i>
                     <h3>My Profile & Balance</h3>
                     <p>View your personal information and current outstanding balance.</p>
                 </div>
-                <div class="card" style="opacity: 0.5; cursor: default;">
+                <div class="card" onclick="showView('schedule-view')">
                     <i class="fa-solid fa-calendar-days"></i>
-                    <h3>Schedule</h3>
-                    <p>Coming soon...</p>
+                    <h3>Class Schedule</h3>
+                    <p>View your weekly class schedule and room assignments.</p>
                 </div>
-                <div class="card" style="opacity: 0.5; cursor: default;">
+                <div class="card" onclick="showView('announcements-view'); loadAnnouncements();">
                     <i class="fa-solid fa-bell"></i>
                     <h3>Announcements</h3>
-                    <p>Coming soon...</p>
+                    <p>Read the latest news and updates from the school.</p>
                 </div>
             </div>
         </div>
@@ -131,8 +183,24 @@
                     <span class="profile-value" id="prof-name">Loading...</span>
                 </div>
                 <div class="profile-row">
+                    <span class="profile-label">LRN:</span>
+                    <span class="profile-value" id="prof-lrn">Loading...</span>
+                </div>
+                <div class="profile-row">
                     <span class="profile-label">Student ID:</span>
                     <span class="profile-value" id="prof-id">Loading...</span>
+                </div>
+                <div class="profile-row">
+                    <span class="profile-label">Date of Birth:</span>
+                    <span class="profile-value" id="prof-dob">Loading...</span>
+                </div>
+                <div class="profile-row">
+                    <span class="profile-label">Age / Sex:</span>
+                    <span class="profile-value"><span id="prof-age">0</span> / <span id="prof-sex">-</span></span>
+                </div>
+                <div class="profile-row">
+                    <span class="profile-label">Guardian Contact:</span>
+                    <span class="profile-value" id="prof-contact">Loading...</span>
                 </div>
                 <div class="profile-row">
                     <span class="profile-label">Current Balance:</span>
@@ -142,6 +210,70 @@
                     <span class="profile-label">Enrollment Status:</span>
                     <span class="profile-value" id="prof-status" style="text-transform: capitalize;">Loading...</span>
                 </div>
+            </div>
+        </div>
+
+        <!-- ANNOUNCEMENTS VIEW -->
+        <div id="announcements-view" class="view-section">
+            <button class="back-btn" onclick="showView('main-dashboard')"><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</button>
+            <h2><i class="fa-solid fa-bell"></i> Latest Announcements</h2>
+            <p>Stay up to date with the latest news from your teachers and administrators.</p>
+            
+            <p id="announcements-loading" style="font-style: italic; color: #666;">Checking for new announcements...</p>
+            <div class="feed-container" id="feed-container">
+                <!-- Announcements will be injected here -->
+            </div>
+        </div>
+
+        <!-- SCHEDULE VIEW -->
+        <div id="schedule-view" class="view-section">
+            <button class="back-btn" onclick="showView('main-dashboard')"><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</button>
+            <h2><i class="fa-solid fa-calendar-days"></i> Weekly Schedule</h2>
+            <p>Your current class schedule for the semester.</p>
+            
+            <div style="overflow-x: auto;">
+                <table class="schedule-table">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Monday</th>
+                            <th>Tuesday</th>
+                            <th>Wednesday</th>
+                            <th>Thursday</th>
+                            <th>Friday</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="time-col">08:00 AM - 09:30 AM</td>
+                            <td class="class-slot">Mathematics<br><small>Room 101</small></td>
+                            <td class="class-slot">Science<br><small>Lab A</small></td>
+                            <td class="class-slot">Mathematics<br><small>Room 101</small></td>
+                            <td class="class-slot">Science<br><small>Lab A</small></td>
+                            <td class="class-slot">Physical Ed.<br><small>Gym</small></td>
+                        </tr>
+                        <tr>
+                            <td class="time-col">09:30 AM - 11:00 AM</td>
+                            <td class="class-slot">English<br><small>Room 102</small></td>
+                            <td class="class-slot">History<br><small>Room 205</small></td>
+                            <td class="class-slot">English<br><small>Room 102</small></td>
+                            <td class="class-slot">History<br><small>Room 205</small></td>
+                            <td class="class-slot">Computer<br><small>Lab B</small></td>
+                        </tr>
+                        <tr>
+                            <td class="time-col">11:00 AM - 12:00 PM</td>
+                            <td colspan="5" class="break-slot">LUNCH BREAK</td>
+                        </tr>
+                        <tr>
+                            <td class="time-col">12:00 PM - 01:30 PM</td>
+                            <td class="class-slot">Values Ed.<br><small>Room 105</small></td>
+                            <td>-</td>
+                            <td class="class-slot">Values Ed.<br><small>Room 105</small></td>
+                            <td>-</td>
+                            <td class="class-slot">Arts & Music<br><small>Room 106</small></td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
@@ -157,6 +289,8 @@
             document.getElementById('student-name').innerText = currentUser.name || "Student";
         }
 
+        const url = 'https://script.google.com/macros/s/AKfycbz6cR-xROnKZME0Fu3CSxiyhYlt4gJgcxxx-Wu_DR9sT2d8H4mrPTtU4XM5GWXFjzfe/exec';
+
         function logout() {
             localStorage.removeItem('currentUser');
             window.location.href = 'index.html';
@@ -168,19 +302,92 @@
         }
 
         function populateProfile() {
-            // We read from the local storage we saved during login!
+            // We read from the local storage we saved during login
             document.getElementById('prof-name').innerText = currentUser.name || "Not set";
-            document.getElementById('prof-id').innerText = currentUser.student_id;
+            document.getElementById('prof-id').innerText = currentUser.student_id || "N/A";
             document.getElementById('prof-balance').innerText = currentUser.balance || "0";
             
-            // Set status with color coding if you want, but text is fine
+            // Extended Info
+            document.getElementById('prof-lrn').innerText = currentUser.lrn || "N/A";
+            
+            // Format Date safely
+            let dobText = "N/A";
+            if (currentUser.dob) {
+                try {
+                    const dateObj = new Date(currentUser.dob);
+                    if (!isNaN(dateObj)) {
+                        dobText = dateObj.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+                    } else {
+                        dobText = currentUser.dob; // fallback
+                    }
+                } catch(e) { dobText = currentUser.dob; }
+            }
+            document.getElementById('prof-dob').innerText = dobText;
+            
+            document.getElementById('prof-age').innerText = currentUser.age || "N/A";
+            document.getElementById('prof-sex').innerText = currentUser.sex || "N/A";
+            document.getElementById('prof-contact').innerText = currentUser.contact || "N/A";
+
+            // Set status
             const statusText = currentUser.status_val || "Pending";
             const statusEl = document.getElementById('prof-status');
             statusEl.innerText = statusText;
-            
             if(statusText.toLowerCase() === 'paid') statusEl.style.color = '#008751';
             else if(statusText.toLowerCase() === 'unpaid') statusEl.style.color = '#ff4d4d';
-            else statusEl.style.color = '#e6a23c'; // pending orange
+            else statusEl.style.color = '#e6a23c'; 
+        }
+
+        async function loadAnnouncements() {
+            const loading = document.getElementById('announcements-loading');
+            const feed = document.getElementById('feed-container');
+            
+            loading.style.display = 'block';
+            feed.innerHTML = '';
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'fetch_announcements' })
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    loading.style.display = 'none';
+                    if (result.data.length === 0) {
+                        feed.innerHTML = '<p>No announcements at this time.</p>';
+                        return;
+                    }
+                    
+                    // Display in reverse order (newest first) assuming sheet is appended top to bottom
+                    result.data.reverse().forEach(ann => {
+                        // Skip empty
+                        if(!ann.message) return;
+                        
+                        let dateStr = ann.date;
+                        try {
+                            const d = new Date(ann.date);
+                            if(!isNaN(d)) {
+                                dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                            }
+                        } catch(e){}
+
+                        const card = document.createElement('div');
+                        card.className = 'announcement-card';
+                        card.innerHTML = `
+                            <div class="announcement-meta">
+                                <i class="fa-solid fa-user-circle"></i> Posted by <strong>${ann.author || 'Admin'}</strong> on ${dateStr}
+                            </div>
+                            <div class="announcement-text">${ann.message.replace(/\\n/g, '<br>')}</div>
+                        `;
+                        feed.appendChild(card);
+                    });
+                } else {
+                    loading.innerText = "Error: Could not load announcements.";
+                }
+            } catch (error) {
+                loading.innerText = "Network error. Please try again later.";
+            }
         }
     </script>
 </body>
