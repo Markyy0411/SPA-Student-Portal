@@ -138,6 +138,10 @@
                     <span class="profile-label">Current Balance:</span>
                     <span class="profile-value balance-value">₱<span id="prof-balance">0</span></span>
                 </div>
+                <div class="profile-row">
+                    <span class="profile-label">Enrollment Status:</span>
+                    <span class="profile-value" id="prof-status" style="text-transform: capitalize;">Loading...</span>
+                </div>
             </div>
         </div>
 
@@ -168,6 +172,15 @@
             document.getElementById('prof-name').innerText = currentUser.name || "Not set";
             document.getElementById('prof-id').innerText = currentUser.student_id;
             document.getElementById('prof-balance').innerText = currentUser.balance || "0";
+            
+            // Set status with color coding if you want, but text is fine
+            const statusText = currentUser.status_val || "Pending";
+            const statusEl = document.getElementById('prof-status');
+            statusEl.innerText = statusText;
+            
+            if(statusText.toLowerCase() === 'paid') statusEl.style.color = '#008751';
+            else if(statusText.toLowerCase() === 'unpaid') statusEl.style.color = '#ff4d4d';
+            else statusEl.style.color = '#e6a23c'; // pending orange
         }
     </script>
 </body>

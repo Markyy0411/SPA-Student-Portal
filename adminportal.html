@@ -150,6 +150,7 @@
                         <th>Name</th>
                         <th>Role</th>
                         <th>Balance (₱)</th>
+                        <th>Status</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -220,12 +221,21 @@
                             <td><span style="text-transform: capitalize;">${user.role}</span></td>
                             <td>
                                 ${user.role === 'student' ? 
-                                `<input type="number" id="balance-${user.student_id}" class="edit-input" value="${user.balance || 0}">` 
+                                `<input type="number" id="balance-${user.student_id}" class="edit-input" value="${user.balance || 0}" style="width: 80px;">` 
                                 : `<span>N/A</span>`}
                             </td>
                             <td>
                                 ${user.role === 'student' ? 
-                                `<button class="save-btn" onclick="updateBalance('${user.student_id}', this)">Save</button>`
+                                `<select id="status-${user.student_id}" class="edit-input" style="width: 110px;">
+                                    <option value="Pending" ${(!user.status_val || user.status_val === 'Pending') ? 'selected' : ''}>Pending</option>
+                                    <option value="Paid" ${user.status_val === 'Paid' ? 'selected' : ''}>Paid</option>
+                                    <option value="Unpaid" ${user.status_val === 'Unpaid' ? 'selected' : ''}>Unpaid</option>
+                                </select>` 
+                                : `<span>N/A</span>`}
+                            </td>
+                            <td>
+                                ${user.role === 'student' ? 
+                                `<button class="save-btn" onclick="updateUser('${user.student_id}', this)">Save</button>`
                                 : ``}
                             </td>
                         `;
@@ -242,8 +252,9 @@
             }
         }
 
-        async function updateBalance(targetId, btn) {
+        async function updateUser(targetId, btn) {
             const newBalance = document.getElementById(`balance-${targetId}`).value;
+            const newStatus = document.getElementById(`status-${targetId}`).value;
             btn.innerText = "Saving...";
             btn.disabled = true;
 
@@ -254,7 +265,8 @@
                         action: 'edit_data',
                         role: currentUser.role,
                         target_id: targetId,
-                        new_balance: newBalance
+                        new_balance: newBalance,
+                        new_status: newStatus
                     })
                 });
                 const result = await response.json();
