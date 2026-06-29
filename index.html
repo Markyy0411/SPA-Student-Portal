@@ -61,6 +61,15 @@
 
         const loginBtn = document.querySelector('.Login-button');
 
+        // Reset button state if returning via browser "Back" button
+        window.addEventListener('pageshow', function (event) {
+            if (event.persisted) {
+                loginBtn.textContent = 'Sign In';
+                loginBtn.disabled = false;
+                passwordInput.value = ''; // Clear password for security
+            }
+        });
+
         loginForm.addEventListener('submit', async function(event) {
             event.preventDefault(); 
             
