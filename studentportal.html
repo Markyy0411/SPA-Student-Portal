@@ -142,6 +142,18 @@
         .time-col { font-weight: 600; background: #f9f9f9; color: #555; }
         .class-slot { background: #e8f5e9; color: #1b5e20; font-weight: 600; border-radius: 4px; }
         .break-slot { background: #fff3e0; color: #e65100; font-weight: 600; }
+
+        /* Document Links */
+        .doc-link {
+            display: block;
+            text-decoration: none;
+            border-left-color: #e63946;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .doc-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+        }
     </style>
 </head>
 <body>
@@ -168,6 +180,11 @@
                     <i class="fa-solid fa-bell"></i>
                     <h3>Announcements</h3>
                     <p>Read the latest news and updates from the school.</p>
+                </div>
+                <div class="card" onclick="showView('documents-view')">
+                    <i class="fa-solid fa-file-pdf"></i>
+                    <h3>Download Documents</h3>
+                    <p>Access enrollment forms, student handbook, and waivers.</p>
                 </div>
             </div>
         </div>
@@ -274,6 +291,48 @@
                         </tr>
                     </tbody>
                 </table>
+            </div>
+        </div>
+
+        <!-- DOCUMENTS VIEW -->
+        <div id="documents-view" class="view-section">
+            <button class="back-btn" onclick="showView('main-dashboard')"><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</button>
+            <h2><i class="fa-solid fa-file-pdf"></i> Download Documents</h2>
+            <p>Click on any document below to download it directly to your device.</p>
+            
+            <div class="feed-container">
+                <a href="#" class="announcement-card doc-link" onclick="alert('This is a presentation mockup. In a fully built system, this would download the PDF file to your device.')">
+                    <div style="display: flex; align-items: center; gap: 20px;">
+                        <i class="fa-solid fa-file-pdf" style="font-size: 35px; color: #e63946;"></i>
+                        <div>
+                            <div class="announcement-text" style="font-weight: 600;">Student Handbook 2025-2026</div>
+                            <div class="announcement-meta" style="margin-bottom: 0; margin-top: 5px;">PDF Document &bull; 2.4 MB</div>
+                        </div>
+                        <i class="fa-solid fa-download" style="margin-left: auto; font-size: 20px; color: #777;"></i>
+                    </div>
+                </a>
+
+                <a href="#" class="announcement-card doc-link" onclick="alert('This is a presentation mockup. In a fully built system, this would download the PDF file to your device.')">
+                    <div style="display: flex; align-items: center; gap: 20px;">
+                        <i class="fa-solid fa-file-pdf" style="font-size: 35px; color: #e63946;"></i>
+                        <div>
+                            <div class="announcement-text" style="font-weight: 600;">Medical Waiver &amp; Consent Form</div>
+                            <div class="announcement-meta" style="margin-bottom: 0; margin-top: 5px;">PDF Document &bull; 150 KB</div>
+                        </div>
+                        <i class="fa-solid fa-download" style="margin-left: auto; font-size: 20px; color: #777;"></i>
+                    </div>
+                </a>
+
+                <a href="#" class="announcement-card doc-link" onclick="alert('This is a presentation mockup. In a fully built system, this would download the PDF file to your device.')">
+                    <div style="display: flex; align-items: center; gap: 20px;">
+                        <i class="fa-solid fa-file-pdf" style="font-size: 35px; color: #e63946;"></i>
+                        <div>
+                            <div class="announcement-text" style="font-weight: 600;">Student Clearance Form</div>
+                            <div class="announcement-meta" style="margin-bottom: 0; margin-top: 5px;">PDF Document &bull; 85 KB</div>
+                        </div>
+                        <i class="fa-solid fa-download" style="margin-left: auto; font-size: 20px; color: #777;"></i>
+                    </div>
+                </a>
             </div>
         </div>
 
