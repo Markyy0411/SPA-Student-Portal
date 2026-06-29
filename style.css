@@ -201,3 +201,41 @@ body {
     border-radius: 4px;
     display: none;
 }
+
+/* Animations */
+.fade-in {
+    animation: fadeIn 1s ease-in-out;
+}
+.slide-down {
+    animation: slideDown 0.8s ease-out;
+}
+.fade-in-up {
+    animation: fadeInUp 0.8s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

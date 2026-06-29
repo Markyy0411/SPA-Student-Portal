@@ -301,7 +301,7 @@
             <p>Click on any document below to download it directly to your device.</p>
             
             <div class="feed-container">
-                <a href="#" class="announcement-card doc-link" onclick="alert('This is a presentation mockup. In a fully built system, this would download the PDF file to your device.')">
+                <a href="#" class="announcement-card doc-link" onclick="Swal.fire({title: 'Download Started!', text: 'This is a presentation mockup. In a fully built system, the Student Handbook PDF would download now.', icon: 'info', confirmButtonColor: '#008751'})">
                     <div style="display: flex; align-items: center; gap: 20px;">
                         <i class="fa-solid fa-file-pdf" style="font-size: 35px; color: #e63946;"></i>
                         <div>
@@ -312,7 +312,7 @@
                     </div>
                 </a>
 
-                <a href="#" class="announcement-card doc-link" onclick="alert('This is a presentation mockup. In a fully built system, this would download the PDF file to your device.')">
+                <a href="#" class="announcement-card doc-link" onclick="Swal.fire({title: 'Download Started!', text: 'This is a presentation mockup. In a fully built system, the Medical Waiver PDF would download now.', icon: 'info', confirmButtonColor: '#008751'})">
                     <div style="display: flex; align-items: center; gap: 20px;">
                         <i class="fa-solid fa-file-pdf" style="font-size: 35px; color: #e63946;"></i>
                         <div>
@@ -323,7 +323,7 @@
                     </div>
                 </a>
 
-                <a href="#" class="announcement-card doc-link" onclick="alert('This is a presentation mockup. In a fully built system, this would download the PDF file to your device.')">
+                <a href="#" class="announcement-card doc-link" onclick="Swal.fire({title: 'Download Started!', text: 'This is a presentation mockup. In a fully built system, the Clearance Form PDF would download now.', icon: 'info', confirmButtonColor: '#008751'})">
                     <div style="display: flex; align-items: center; gap: 20px;">
                         <i class="fa-solid fa-file-pdf" style="font-size: 35px; color: #e63946;"></i>
                         <div>
@@ -337,6 +337,9 @@
         </div>
 
     </div>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         // Security check

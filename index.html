@@ -7,16 +7,18 @@
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    <!-- SweetAlert2 for beautiful popups -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 
-    <div class="BG-image"></div>
+    <div class="BG-image fade-in"></div>
 
-    <div class="headline-container">
+    <div class="headline-container slide-down">
         <h1>Making payment easier with School Portal</h1>
     </div>
 
-    <div class="Logo-Holder">
+    <div class="Logo-Holder fade-in-up">
         <div class="Logo">
             <img src="logo.png" alt="Saint Patrick Academy Logo">
         </div>
@@ -25,7 +27,7 @@
             <form class="Login-form" id="loginForm">
                 <h2>Student Login</h2>
                 
-                <div class="error-msg" id="errorMessage">Invalid credentials</div>
+                <div class="error-msg" id="errorMessage" style="display: none;">Invalid credentials</div>
 
                 <div class="input-group">
                     <i class="fa-solid fa-user"></i>
@@ -119,6 +121,14 @@
                         sex: result.sex,
                         contact: result.contact
                     }));
+
+                    await Swal.fire({
+                        title: 'Login Successful!',
+                        text: 'Welcome to your Student Portal.',
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
                     
                     // Route based on role
                     if (result.role === 'admin') {
@@ -129,15 +139,23 @@
                         window.location.href = 'studentportal.html';
                     }
                 } else {
-                    errorMessage.textContent = result.message || 'Incorrect Password or Student ID';
-                    errorMessage.style.display = 'block';
+                    Swal.fire({
+                        title: 'Login Failed',
+                        text: result.message || 'Incorrect Password or Student ID',
+                        icon: 'error',
+                        confirmButtonColor: '#008751'
+                    });
                     loginBtn.textContent = 'Sign In';
                     loginBtn.disabled = false;
                 }
             } catch (error) {
                 console.error('Error:', error);
-                errorMessage.textContent = 'Network error. Please try again.';
-                errorMessage.style.display = 'block';
+                Swal.fire({
+                    title: 'Network Error',
+                    text: 'Please check your connection and try again.',
+                    icon: 'warning',
+                    confirmButtonColor: '#008751'
+                });
                 loginBtn.textContent = 'Sign In';
                 loginBtn.disabled = false;
             }
