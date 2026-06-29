@@ -59,7 +59,9 @@
         const studentIdInput = document.getElementById('studentId');
         const errorMessage = document.getElementById('errorMessage');
 
-        loginForm.addEventListener('submit', function(event) {
+        const loginBtn = document.querySelector('.Login-button');
+
+        loginForm.addEventListener('submit', async function(event) {
             event.preventDefault(); 
             
             const studentId = studentIdInput.value.trim();
@@ -71,23 +73,55 @@
                 return;
             }
 
-            const idRegex = /^[0-9]+$/;
-            if (!idRegex.test(studentId)) {
-                errorMessage.textContent = 'Student ID must contain only numbers.';
-                errorMessage.style.display = 'block';
-                return;
-            }
-
-            if (password.length < 6) {
-                errorMessage.textContent = 'Password must be at least 6 characters.';
-                errorMessage.style.display = 'block';
-                return;
-            }
-
             errorMessage.style.display = 'none';
+            loginBtn.textContent = 'Verifying...';
+            loginBtn.disabled = true;
 
-            // Redirect to the portal
-            window.location.href = 'studentportal.html';
+            const url = 'https://script.google.com/macros/s/AKfycbz6cR-xROnKZME0Fu3CSxiyhYlt4gJgcxxx-Wu_DR9sT2d8H4mrPTtU4XM5GWXFjzfe/exec';
+            
+            try {
+                // Using POST without headers defaults to text/plain, avoiding CORS preflight issues with Google Apps Script
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'login',
+                        student_id: studentId,
+                        password: password
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    // Save user data to localStorage
+                    localStorage.setItem('currentUser', JSON.stringify({
+                        student_id: studentId,
+                        role: result.role,
+                        name: result.name,
+                        balance: result.balance
+                    }));
+                    
+                    // Route based on role
+                    if (result.role === 'admin') {
+                        window.location.href = 'adminportal.html';
+                    } else if (result.role === 'staff') {
+                        window.location.href = 'staffportal.html';
+                    } else {
+                        window.location.href = 'studentportal.html';
+                    }
+                } else {
+                    errorMessage.textContent = result.message || 'Incorrect Password or Student ID';
+                    errorMessage.style.display = 'block';
+                    loginBtn.textContent = 'Sign In';
+                    loginBtn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                errorMessage.textContent = 'Network error. Please try again.';
+                errorMessage.style.display = 'block';
+                loginBtn.textContent = 'Sign In';
+                loginBtn.disabled = false;
+            }
         });
     </script>
 </body>
