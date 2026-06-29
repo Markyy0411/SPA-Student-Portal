@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Saint Patrick Academy School Portal</title>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -11,49 +13,64 @@
     <div class="BG-image"></div>
 
     <div class="Logo-Holder">
-
         <div class="Logo">
             <img src="logo.png" alt="Saint Patrick Academy Logo">
         </div>
 
         <div class="Login-container">
-            <!-- Changed to a proper form element -->
             <form class="Login-form" id="loginForm">
-                <input type="text" id="studentId" placeholder="Student ID" required>
-                <input type="password" id="password" placeholder="Password" required>
+                <h2>Student Login</h2>
                 
-                <!-- Error message placeholder -->
-                <p id="errorMessage" style="color: red; font-size: 12px; margin-top: 5px; display: none;">Invalid credentials</p>
+                <div class="error-msg" id="errorMessage">Invalid credentials</div>
+
+                <div class="input-group">
+                    <i class="fa-solid fa-user"></i>
+                    <input type="text" id="studentId" placeholder="Student ID" required>
+                </div>
                 
-                <!-- Proper submit button -->
-                <button type="submit" class="Login-button">Login</button>
+                <div class="input-group">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" id="password" placeholder="Password" required>
+                    <i class="fa-solid fa-eye toggle-password" id="togglePassword"></i>
+                </div>
+                
+                <button type="submit" class="Login-button">Sign In</button>
             </form>
         </div>
-
     </div>
 
-    <!-- JavaScript for Form Validation -->
+    <!-- JavaScript for Form Validation and Password Toggle -->
     <script>
+        // Password Visibility Toggle
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+
+        togglePassword.addEventListener('click', function () {
+            // Toggle the type attribute
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            // Toggle the eye / eye-slash icon
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+
+        // Form Validation
         const loginForm = document.getElementById('loginForm');
         const studentIdInput = document.getElementById('studentId');
-        const passwordInput = document.getElementById('password');
         const errorMessage = document.getElementById('errorMessage');
 
         loginForm.addEventListener('submit', function(event) {
-            // Prevent the page from instantly reloading or navigating away
             event.preventDefault(); 
             
             const studentId = studentIdInput.value.trim();
             const password = passwordInput.value.trim();
 
-            // 1. Check if empty
             if (studentId === '' || password === '') {
                 errorMessage.textContent = 'Please fill out all fields.';
                 errorMessage.style.display = 'block';
                 return;
             }
 
-            // 2. Student ID must be numbers only
             const idRegex = /^[0-9]+$/;
             if (!idRegex.test(studentId)) {
                 errorMessage.textContent = 'Student ID must contain only numbers.';
@@ -61,14 +78,12 @@
                 return;
             }
 
-            // 3. Password length check
             if (password.length < 6) {
                 errorMessage.textContent = 'Password must be at least 6 characters.';
                 errorMessage.style.display = 'block';
                 return;
             }
 
-            // Validation passed! Hide error
             errorMessage.style.display = 'none';
 
             // Redirect to the portal
