@@ -1,14 +1,79 @@
-<div class="Login-container">
-    <!-- Changed to a proper <form> element and added an ID -->
-    <form class="Login-form" id="loginForm">
-        <!-- Added required attributes -->
-        <input type="text" id="studentId" placeholder="Student ID" required>
-        <input type="password" id="password" placeholder="Password" required>
-        
-        <!-- Error message placeholder -->
-        <p id="errorMessage" style="color: red; font-size: 12px; display: none;">Invalid credentials</p>
-        
-        <!-- Changed to a real submit button -->
-        <button type="submit" class="Login-button">Login</button>
-    </form>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saint Patrick Academy School Portal</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="BG-image"></div>
+
+    <div class="Logo-Holder">
+
+        <div class="Logo">
+            <img src="logo.png" alt="Saint Patrick Academy Logo">
+        </div>
+
+        <div class="Login-container">
+            <!-- Changed to a proper form element -->
+            <form class="Login-form" id="loginForm">
+                <input type="text" id="studentId" placeholder="Student ID" required>
+                <input type="password" id="password" placeholder="Password" required>
+                
+                <!-- Error message placeholder -->
+                <p id="errorMessage" style="color: red; font-size: 12px; margin-top: 5px; display: none;">Invalid credentials</p>
+                
+                <!-- Proper submit button -->
+                <button type="submit" class="Login-button">Login</button>
+            </form>
+        </div>
+
+    </div>
+
+    <!-- JavaScript for Form Validation -->
+    <script>
+        const loginForm = document.getElementById('loginForm');
+        const studentIdInput = document.getElementById('studentId');
+        const passwordInput = document.getElementById('password');
+        const errorMessage = document.getElementById('errorMessage');
+
+        loginForm.addEventListener('submit', function(event) {
+            // Prevent the page from instantly reloading or navigating away
+            event.preventDefault(); 
+            
+            const studentId = studentIdInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            // 1. Check if empty
+            if (studentId === '' || password === '') {
+                errorMessage.textContent = 'Please fill out all fields.';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            // 2. Student ID must be numbers only
+            const idRegex = /^[0-9]+$/;
+            if (!idRegex.test(studentId)) {
+                errorMessage.textContent = 'Student ID must contain only numbers.';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            // 3. Password length check
+            if (password.length < 6) {
+                errorMessage.textContent = 'Password must be at least 6 characters.';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            // Validation passed! Hide error
+            errorMessage.style.display = 'none';
+
+            // Redirect to the portal
+            window.location.href = 'studentportal.html';
+        });
+    </script>
+</body>
+</html>
