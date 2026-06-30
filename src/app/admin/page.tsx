@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { LogOut, Users, Settings, ShieldCheck, Bullhorn, ArrowLeft, Loader2 } from 'lucide-react';
+import { LogOut, Users, Settings, ShieldCheck, Megaphone, ArrowLeft, Loader2 } from 'lucide-react';
 import Swal from 'sweetalert2';
 
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz6cR-xROnKZME0Fu3CSxiyhYlt4gJgcxxx-Wu_DR9sT2d8H4mrPTtU4XM5GWXFjzfe/exec';
@@ -185,7 +185,7 @@ export default function AdminDashboard() {
 
             <div onClick={() => setActiveView('announcements')} className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer group">
               <div className="bg-green-50 w-14 h-14 rounded-xl flex items-center justify-center mb-4 text-green-600">
-                <Bullhorn size={28} />
+                <Megaphone size={28} />
               </div>
               <h2 className="text-xl font-bold text-gray-900 mb-2">Global Announcements</h2>
               <p className="text-gray-500 text-sm mb-4">Post important announcements and updates to all student and staff portals.</p>
@@ -292,7 +292,7 @@ export default function AdminDashboard() {
             </button>
             
             <h2 className="text-2xl font-bold text-gray-900 mb-2 flex items-center">
-              <Bullhorn className="mr-3 text-green-600" size={28} /> Post Announcement
+              <Megaphone className="mr-3 text-green-600" size={28} /> Post Announcement
             </h2>
             <p className="text-gray-600 mb-6">Write an announcement below. It will instantly appear on the Student Portal feed.</p>
             
