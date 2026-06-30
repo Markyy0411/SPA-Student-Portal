@@ -134,7 +134,9 @@
                     studentNameDisplay.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> ID not found';
                 }
             } catch (error) {
-                studentNameDisplay.style.display = 'none';
+                console.error("verifyId error:", error);
+                studentNameDisplay.style.color = '#e63946';
+                studentNameDisplay.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Error connecting to server. Did you deploy New Version?';
             }
         }, 800));
 
