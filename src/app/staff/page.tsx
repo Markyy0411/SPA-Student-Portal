@@ -47,9 +47,6 @@ export default function StaffDashboard() {
     try {
       const response = await fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'text/plain;charset=utf-8',
-        },
         body: JSON.stringify({
           action: 'fetch_data',
           role: currentUser.role,
@@ -90,9 +87,6 @@ export default function StaffDashboard() {
     try {
       const response = await fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'text/plain;charset=utf-8',
-        },
         body: JSON.stringify({
           action: 'edit_data',
           role: currentUser.role,
@@ -136,9 +130,6 @@ export default function StaffDashboard() {
     try {
       const response = await fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'text/plain;charset=utf-8',
-        },
         body: JSON.stringify({
           action: 'post_announcement',
           role: currentUser.role,

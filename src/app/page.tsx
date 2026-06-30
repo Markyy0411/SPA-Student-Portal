@@ -52,9 +52,6 @@ export default function LoginPage() {
       const response = await fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
         signal: controller.signal,
-        headers: {
-          'Content-Type': 'text/plain;charset=utf-8',
-        },
         body: JSON.stringify({ action: 'verifyId', student_id: studentId })
       });
       clearTimeout(timeoutId);
@@ -91,9 +88,6 @@ export default function LoginPage() {
       const response = await fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
         signal: controller.signal,
-        headers: {
-          'Content-Type': 'text/plain;charset=utf-8',
-        },
         body: JSON.stringify({ action: 'login', student_id: studentId, password: password })
       });
       clearTimeout(timeoutId);
