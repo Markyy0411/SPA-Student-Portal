@@ -116,8 +116,14 @@
             };
         }
 
+        let isVerifying = false;
+        let isCheckingId = false;
+
         // Handle the actual login request
         async function attemptLogin(studentId, password) {
+            if (isVerifying) return;
+            isVerifying = true;
+
             errorMessage.style.display = 'none';
             studentNameDisplay.style.display = 'block';
             studentNameDisplay.style.color = '#555';
@@ -187,11 +193,17 @@
                 errorMessage.style.display = 'block';
                 signInBtn.textContent = 'Sign In';
                 signInBtn.disabled = false;
+            } finally {
+                isVerifying = false;
             }
         }
 
         // Handle ID Verification
         async function verifyStudentId() {
+            if (isCheckingId) return;
+            // If Step 2 is already visible, ignore any delayed checks (like from browser autofill modifying the hidden ID)
+            if (step2Container.style.display === 'block' || step2Container.style.display === '') return;
+            
             const studentId = studentIdInput.value.trim();
             if (studentId === '') {
                 errorMessage.textContent = 'Please enter your Student ID.';
@@ -240,6 +252,8 @@
                 errorMessage.style.display = 'block';
                 nextBtn.disabled = false;
                 nextBtn.textContent = 'Next';
+            } finally {
+                isCheckingId = false;
             }
         }
 
