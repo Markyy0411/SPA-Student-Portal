@@ -18,9 +18,27 @@ export default function LoginPage() {
   const [displayName, setDisplayName] = useState('');
   const [showAbout, setShowAbout] = useState(false);
 
-  const handleVerifyId = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (isVerifying || !studentId.trim()) return;
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (step === 1 && studentId.trim().length >= 4 && !isVerifying && !errorMsg) {
+        handleVerifyId();
+      }
+    }, 800);
+    return () => clearTimeout(timer);
+  }, [studentId, step]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (step === 2 && password.trim().length >= 4 && !isVerifying) {
+        handleLogin();
+      }
+    }, 800);
+    return () => clearTimeout(timer);
+  }, [password, step]);
+
+  const handleVerifyId = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (isVerifying) return;
     
     setIsVerifying(true);
     setErrorMsg('');
@@ -45,9 +63,9 @@ export default function LoginPage() {
     }
   };
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (isVerifying || !password.trim()) return;
+  const handleLogin = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (isVerifying) return;
 
     setIsVerifying(true);
     setErrorMsg('');
