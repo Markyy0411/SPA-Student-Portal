@@ -332,10 +332,12 @@
         const aboutContainer = document.getElementById('aboutContainer');
         const aboutSchoolBtn = document.getElementById('aboutSchoolBtn');
         const exitAboutBtn = document.getElementById('exitAboutBtn');
+        const headlineContainer = document.querySelector('.headline-container');
 
         aboutSchoolBtn.addEventListener('click', function(e) {
             e.preventDefault();
             loginContainer.style.display = 'none';
+            if (headlineContainer) headlineContainer.style.display = 'none';
             aboutContainer.style.display = 'flex';
             aboutContainer.classList.add('fade-in');
             this.parentElement.style.display = 'none'; // hide the footer link
@@ -345,6 +347,7 @@
             e.preventDefault();
             aboutContainer.style.display = 'none';
             loginContainer.style.display = 'flex';
+            if (headlineContainer) headlineContainer.style.display = 'block';
             loginContainer.classList.add('fade-in');
             aboutSchoolBtn.parentElement.style.display = 'block'; // show the footer link
         });
