@@ -217,17 +217,19 @@ export default function LoginPage() {
 
         {/* About Section Overlay */}
         {showAbout && (
-          <div className="absolute inset-0 bg-white/95 backdrop-blur-md rounded-2xl p-8 shadow-2xl border border-white/20 animate-fade-in z-10 flex flex-col justify-center overflow-y-auto">
-            <button 
-              type="button"
-              className="absolute top-4 left-4 text-gray-500 hover:text-green-600 transition-colors flex items-center text-sm font-medium"
-              onClick={() => setShowAbout(false)}
-            >
-              <ArrowLeft size={16} className="mr-1" /> Back
-            </button>
-            <h2 className="text-2xl font-bold text-green-700 mb-6 text-center">Saint Patrick's Academy</h2>
+          <div className="absolute inset-0 bg-white/95 backdrop-blur-md rounded-2xl p-6 sm:p-8 shadow-2xl border border-white/20 animate-fade-in z-10 overflow-y-auto flex flex-col">
+            <div className="flex-none mb-6 mt-4">
+              <button 
+                type="button"
+                className="absolute top-4 left-4 text-gray-500 hover:text-green-600 transition-colors flex items-center text-sm font-medium bg-white/50 px-2 py-1 rounded-md"
+                onClick={() => setShowAbout(false)}
+              >
+                <ArrowLeft size={16} className="mr-1" /> Back
+              </button>
+              <h2 className="text-2xl font-bold text-green-700 text-center mt-6">Saint Patrick's Academy</h2>
+            </div>
             
-            <div className="text-gray-700 text-sm space-y-4 mb-6">
+            <div className="text-gray-700 text-sm space-y-4 mb-6 flex-1">
               <p><strong>Location:</strong> Dingalan, Aurora</p>
               <p><strong>Founded:</strong> 1968</p>
               
@@ -242,12 +244,14 @@ export default function LoginPage() {
               </div>
             </div>
             
-            <button
-              onClick={() => setShowAbout(false)}
-              className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors w-max mx-auto shadow-md mt-auto"
-            >
-              Close
-            </button>
+            <div className="flex-none pb-2 mt-4">
+              <button
+                onClick={() => setShowAbout(false)}
+                className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors w-max mx-auto shadow-md block"
+              >
+                Close
+              </button>
+            </div>
           </div>
         )}
 
