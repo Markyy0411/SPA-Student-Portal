@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { LogOut, GraduationCap, IdCard, CalendarDays, Bell, FileText, Download } from 'lucide-react';
 import Swal from 'sweetalert2';
+import { supabase } from '@/utils/supabase';
 
 export default function StudentDashboard() {
   const router = useRouter();
@@ -11,8 +12,6 @@ export default function StudentDashboard() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [announcements, setAnnouncements] = useState<any[]>([]);
   const [loadingAnnouncements, setLoadingAnnouncements] = useState(false);
-
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz6cR-xROnKZME0Fu3CSxiyhYlt4gJgcxxx-Wu_DR9sT2d8H4mrPTtU4XM5GWXFjzfe/exec';
 
   useEffect(() => {
     const userStr = localStorage.getItem('currentUser');
@@ -39,13 +38,13 @@ export default function StudentDashboard() {
 
     setLoadingAnnouncements(true);
     try {
-      const response = await fetch(SCRIPT_URL, {
-        method: 'POST',
-        body: JSON.stringify({ action: 'fetch_announcements' })
-      });
-      const result = await response.json();
-      if (result.status === 'success') {
-        setAnnouncements(result.data.reverse()); // Newest first
+      const { data, error } = await supabase
+        .from('announcements')
+        .select('*')
+        .order('date', { ascending: false });
+
+      if (data && !error) {
+        setAnnouncements(data);
       }
     } catch (e) {
       console.error(e);

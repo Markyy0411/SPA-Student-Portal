@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { User, Lock, CheckCircle, Loader2 } from 'lucide-react';
 import Swal from 'sweetalert2';
+import { supabase } from '@/utils/supabase';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -14,9 +15,6 @@ export default function LoginPage() {
   const [isVerifying, setIsVerifying] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [displayName, setDisplayName] = useState('');
-  
-  // Temporary: Continue using Google Apps Script until Supabase migration is ready
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz6cR-xROnKZME0Fu3CSxiyhYlt4gJgcxxx-Wu_DR9sT2d8H4mrPTtU4XM5GWXFjzfe/exec';
 
   const handleVerifyId = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,30 +24,20 @@ export default function LoginPage() {
     setErrorMsg('');
 
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 25000);
-
-      const response = await fetch(SCRIPT_URL, {
-        method: 'POST',
-        body: JSON.stringify({ action: 'verifyId', student_id: studentId }),
-        signal: controller.signal
-      });
+      const { data, error } = await supabase
+        .from('users')
+        .select('name')
+        .eq('student_id', studentId)
+        .single();
       
-      clearTimeout(timeoutId);
-      const result = await response.json();
-      
-      if (result.status === 'success') {
-        setDisplayName(result.name || 'User');
-        setStep(2);
-      } else {
+      if (error || !data) {
         setErrorMsg('Student ID not found.');
+      } else {
+        setDisplayName(data.name || 'User');
+        setStep(2);
       }
     } catch (error: any) {
-      if (error.name === 'AbortError') {
-        setErrorMsg('Server is taking too long. Please try again.');
-      } else {
-        setErrorMsg('Network error verifying ID.');
-      }
+      setErrorMsg('Network error verifying ID.');
     } finally {
       setIsVerifying(false);
     }
@@ -63,31 +51,17 @@ export default function LoginPage() {
     setErrorMsg('');
 
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 25000);
-
-      const response = await fetch(SCRIPT_URL, {
-        method: 'POST',
-        body: JSON.stringify({ action: 'login', student_id: studentId, password }),
-        signal: controller.signal
-      });
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('student_id', studentId)
+        .eq('password', password)
+        .single();
       
-      clearTimeout(timeoutId);
-      const result = await response.json();
-      
-      if (result.status === 'success') {
-        localStorage.setItem('currentUser', JSON.stringify({
-          student_id: studentId,
-          role: result.role,
-          name: result.name,
-          balance: result.balance,
-          status_val: result.status_val,
-          lrn: result.lrn,
-          dob: result.dob,
-          age: result.age,
-          sex: result.sex,
-          contact: result.contact
-        }));
+      if (error || !data) {
+        setErrorMsg('Incorrect Password');
+      } else {
+        localStorage.setItem('currentUser', JSON.stringify(data));
 
         await Swal.fire({
           title: 'Login Successful!',
@@ -97,18 +71,12 @@ export default function LoginPage() {
           showConfirmButton: false
         });
 
-        if (result.role === 'admin') router.push('/admin');
-        else if (result.role === 'staff') router.push('/staff');
+        if (data.role === 'admin') router.push('/admin');
+        else if (data.role === 'staff') router.push('/staff');
         else router.push('/student');
-      } else {
-        setErrorMsg(result.message || 'Incorrect Password');
       }
     } catch (error: any) {
-      if (error.name === 'AbortError') {
-        setErrorMsg('Server is taking too long. Please try again.');
-      } else {
-        setErrorMsg('Network Error. Please check your connection.');
-      }
+      setErrorMsg('Network Error. Please check your connection.');
     } finally {
       setIsVerifying(false);
     }
