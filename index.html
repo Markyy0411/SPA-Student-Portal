@@ -15,6 +15,26 @@
     <meta name="theme-color" content="#008751">
 </head>
 <body>
+    <!-- MASTER KILL SWITCH -->
+    <script>
+        // Set this to 'true' to completely lock the website until the client pays.
+        // Set it back to 'false' to instantly restore full access.
+        const PORTAL_LOCKED = true;
+
+        if (PORTAL_LOCKED) {
+            document.write(`
+                <div style="display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #111; color: #fff; font-family: 'Inter', sans-serif; text-align: center; padding: 20px;">
+                    <div>
+                        <i class="fa-solid fa-triangle-exclamation" style="font-size: 50px; color: #ff4757; margin-bottom: 20px;"></i>
+                        <h1 style="font-size: 24px; margin-bottom: 10px;">Service Suspended</h1>
+                        <p style="color: #ccc; font-size: 16px;">This portal has been temporarily suspended pending payment for development services.</p>
+                        <p style="color: #777; font-size: 14px; margin-top: 20px;">Please contact the developer to restore access.</p>
+                    </div>
+                </div>
+            `);
+            document.close(); // Stops the rest of the HTML from rendering
+        }
+    </script>
 
     <div class="BG-image fade-in"></div>
 
