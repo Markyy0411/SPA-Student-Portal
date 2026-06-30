@@ -41,7 +41,7 @@
                     <button type="button" class="Login-button" id="nextBtn" style="margin-top: 5px;">Next</button>
                 </div>
                 
-                <div id="studentNameDisplay" style="color: #10af33; font-weight: 600; text-align: center; margin-bottom: 15px; margin-top: 15px; display: none; font-size: 15px;"></div>
+                <div id="studentNameDisplay" style="color: #ffffff; font-weight: 500; text-align: center; margin-bottom: 15px; margin-top: 15px; display: none; font-size: 16px; letter-spacing: 0.5px;"></div>
 
                 <div id="step2Container" style="display: none; transition: all 0.5s ease;">
                     <div class="input-group">
@@ -139,8 +139,8 @@
                 
                 if (result.status === 'success') {
                     // Show Name on Screen!
-                    studentNameDisplay.style.color = '#10af33';
-                    studentNameDisplay.innerHTML = '<i class="fa-solid fa-check-circle"></i> Welcome, ' + result.name + '!';
+                    studentNameDisplay.style.color = '#ffffff';
+                    studentNameDisplay.innerHTML = '<i class="fa-solid fa-check-circle" style="color: #4ade80; margin-right: 5px;"></i> Welcome, ' + result.name + '!';
                     
                     // Save user data to localStorage
                     localStorage.setItem('currentUser', JSON.stringify({
@@ -217,8 +217,8 @@
                 const result = await response.json();
                 
                 if (result.status === 'success' && result.name) {
-                    studentNameDisplay.style.color = '#10af33';
-                    studentNameDisplay.innerHTML = '<i class="fa-solid fa-check-circle"></i> Welcome, ' + result.name + '!';
+                    studentNameDisplay.style.color = '#ffffff';
+                    studentNameDisplay.innerHTML = '<i class="fa-solid fa-check-circle" style="color: #4ade80; margin-right: 5px;"></i> Welcome, ' + result.name + '!';
                     
                     // Proceed to Step 2
                     step1Container.style.display = 'none';
