@@ -144,14 +144,7 @@ export default function AdminDashboard() {
     }
   };
 
-  if (!currentUser) {
-    return (
-      <div className="min-h-screen bg-[#111] flex flex-col items-center justify-center font-sans">
-        <Loader2 className="animate-spin text-white w-12 h-12 mb-4" />
-        <p className="text-gray-300 font-medium">Loading portal...</p>
-      </div>
-    );
-  }
+  if (!currentUser) return null;
 
   return (
     <div className="min-h-screen font-sans relative overflow-x-hidden text-gray-800">
