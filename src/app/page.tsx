@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { User, Lock, Eye, EyeOff, Info, ArrowLeft, X, CheckCircle, Loader2 } from 'lucide-react';
+import { User, Lock, CheckCircle, Loader2, Info, X, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import Swal from 'sweetalert2';
 
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz6cR-xROnKZME0Fu3CSxiyhYlt4gJgcxxx-Wu_DR9sT2d8H4mrPTtU4XM5GWXFjzfe/exec';
@@ -13,12 +13,12 @@ export default function LoginPage() {
   const [step, setStep] = useState(1);
   const [studentId, setStudentId] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [showAbout, setShowAbout] = useState(false);
 
+  // Auto-verify Student ID
   useEffect(() => {
     const timer = setTimeout(() => {
       if (step === 1 && studentId.trim().length >= 4 && !isVerifying && !errorMsg) {
@@ -28,6 +28,7 @@ export default function LoginPage() {
     return () => clearTimeout(timer);
   }, [studentId, step]);
 
+  // Auto-verify Password
   useEffect(() => {
     const timer = setTimeout(() => {
       if (step === 2 && password.trim().length >= 4 && !isVerifying) {
@@ -39,7 +40,7 @@ export default function LoginPage() {
 
   const handleVerifyId = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (isVerifying) return;
+    if (isVerifying || !studentId.trim()) return;
     
     setIsVerifying(true);
     setErrorMsg('');
@@ -47,15 +48,12 @@ export default function LoginPage() {
     try {
       const response = await fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
-        body: JSON.stringify({
-          action: 'verifyId',
-          student_id: studentId
-        })
+        body: JSON.stringify({ action: 'verifyId', student_id: studentId })
       });
-      const result = await response.json();
+      const data = await response.json();
       
-      if (result.status === 'success') {
-        setDisplayName(result.name || 'User');
+      if (data.status === 'success') {
+        setDisplayName(data.name || 'User');
         setStep(2);
       } else {
         setErrorMsg('Student ID not found.');
@@ -69,7 +67,7 @@ export default function LoginPage() {
 
   const handleLogin = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (isVerifying) return;
+    if (isVerifying || !password.trim()) return;
 
     setIsVerifying(true);
     setErrorMsg('');
@@ -77,11 +75,7 @@ export default function LoginPage() {
     try {
       const response = await fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
-        body: JSON.stringify({
-          action: 'login',
-          student_id: studentId,
-          password: password
-        })
+        body: JSON.stringify({ action: 'login', student_id: studentId, password: password })
       });
       const data = await response.json();
       
@@ -101,7 +95,7 @@ export default function LoginPage() {
 
         await Swal.fire({
           title: 'Login Successful!',
-          text: 'Welcome to your Student Portal.',
+          text: 'Welcome to your portal.',
           icon: 'success',
           timer: 1500,
           showConfirmButton: false
@@ -121,154 +115,141 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden font-sans">
-      {/* Background Image with Blur and Overlay */}
-      <div 
-        className="fixed inset-0 bg-[url('/bg.jpg')] bg-cover bg-center bg-no-repeat blur-[5px] scale-110 -z-20"
-      ></div>
-      <div className="fixed inset-0 bg-black/50 -z-10"></div>
-
-      {/* Headline */}
-      {!showAbout && (
-        <div className="absolute top-[8%] w-full text-center px-5 z-10 animate-fade-in-up">
-          <h1 className="text-white text-3xl md:text-5xl font-bold tracking-wide drop-shadow-2xl">
-            Making payment easier with School Portal
-          </h1>
-        </div>
-      )}
-
-      {/* Main Content */}
-      <div className="flex flex-wrap items-center justify-center gap-10 p-5 z-10 w-full max-w-[900px]">
-        {/* Logo */}
-        <div className="flex justify-center items-center flex-1 min-w-[300px] max-w-[350px] animate-fade-in-up">
+    <div 
+      className="min-h-screen flex items-center justify-center p-4 bg-cover bg-center bg-fixed relative"
+      style={{ backgroundImage: "url('/bghome.jpg')" }}
+    >
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+      
+      <div className="relative w-full max-w-md bg-white/90 backdrop-blur-md rounded-2xl p-8 shadow-2xl border border-white/20">
+        <div className="text-center mb-8">
           <Image 
             src="/logo.png" 
-            alt="Saint Patrick Academy Logo" 
-            width={350} 
-            height={350}
-            className="w-full h-auto drop-shadow-2xl"
+            alt="School Logo" 
+            width={100} 
+            height={100} 
+            className="mx-auto mb-4"
           />
+          <h1 className="text-3xl font-bold text-green-700 tracking-tight">Student Portal</h1>
+          <p className="text-gray-500 mt-2 text-sm">Secure access to your records</p>
         </div>
 
-        {/* Auth / About Container */}
-        <div className="flex-1 min-w-[350px] max-w-[450px] animate-fade-in-up">
-          {showAbout ? (
-            <div className="bg-white/95 backdrop-blur-md border border-white/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] rounded-[20px] p-10 text-gray-800 flex flex-col">
-              <h2 className="text-[#008751] text-center mb-5 font-bold text-2xl">Saint Patrick's Academy</h2>
-              
-              <div className="space-y-2 mb-5">
-                <p className="text-[15px]"><strong>Location:</strong> Dingalan, Aurora</p>
-                <p className="text-[15px]"><strong>Founded:</strong> 1968</p>
+        {errorMsg && (
+          <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm font-medium mb-6 text-center shadow-sm animate-pulse">
+            {errorMsg}
+          </div>
+        )}
+
+        {step === 2 && displayName && (
+          <div className="bg-green-600 text-white p-3 rounded-lg text-sm font-medium mb-6 flex items-center justify-center shadow-md animate-fade-in-up">
+            <CheckCircle className="w-4 h-4 mr-2" />
+            Welcome, {displayName}!
+          </div>
+        )}
+
+        {step === 1 ? (
+          <form onSubmit={handleVerifyId} className="space-y-6">
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-green-600 transition-colors">
+                <User size={20} />
               </div>
-              
-              <div className="h-px bg-gray-300 my-5"></div>
-              
-              <h3 className="text-[#008751] text-lg font-semibold mb-1">Vision</h3>
-              <p className="text-[14px] text-gray-600 leading-relaxed mb-4">
-                To provide holistic formation for students inspired by the Blessed Trinity and in communion with the family, church, and community.
-              </p>
-              
-              <h3 className="text-[#008751] text-lg font-semibold mb-1">Mission</h3>
-              <p className="text-[14px] text-gray-600 leading-relaxed mb-5">
-                Following Jesus Christ through living the Carmelian spirit of prayer, compassion, and prophetic action to provide quality education for the church and society.
-              </p>
-              
-              <button 
-                onClick={() => setShowAbout(false)}
-                className="mt-5 bg-[#e63946] hover:bg-[#d62828] text-white font-semibold py-3 px-4 rounded-[10px] flex items-center justify-center transition-all hover:-translate-y-1 w-full"
+              <input
+                type="text"
+                placeholder="Enter Student ID"
+                value={studentId}
+                onChange={(e) => setStudentId(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 bg-gray-50/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all outline-none text-gray-700 font-medium"
+                required
+              />
+            </div>
+            
+            <button
+              type="submit"
+              disabled={isVerifying}
+              className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-xl shadow-lg shadow-green-600/30 transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
+            >
+              {isVerifying ? <Loader2 className="animate-spin w-5 h-5 mr-2" /> : null}
+              {isVerifying ? 'Checking...' : 'Next'}
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={handleLogin} className="space-y-6 animate-fade-in-up">
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-green-600 transition-colors">
+                <Lock size={20} />
+              </div>
+              <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 bg-gray-50/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all outline-none text-gray-700 font-medium"
+                required
+                autoFocus
+              />
+            </div>
+            
+            <button
+              type="submit"
+              disabled={isVerifying}
+              className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-xl shadow-lg shadow-green-600/30 transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
+            >
+              {isVerifying ? <Loader2 className="animate-spin w-5 h-5 mr-2" /> : null}
+              {isVerifying ? 'Verifying...' : 'Sign In'}
+            </button>
+            
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={() => {
+                  setStep(1);
+                  setStudentId('');
+                  setPassword('');
+                  setErrorMsg('');
+                }}
+                className="text-sm text-gray-500 hover:text-green-600 font-medium transition-colors"
               >
-                <X size={18} className="mr-2" /> Exit About Section
+                Not you? Change ID
               </button>
             </div>
-          ) : (
-            <div className="bg-white/10 backdrop-blur-md border border-white/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] rounded-[20px] p-10 flex flex-col">
-              <h2 className="text-white text-center mb-8 font-semibold text-2xl tracking-wide">Student Login</h2>
-              
-              {errorMsg && (
-                <div className="bg-[#ff4d4d]/10 border-l-4 border-[#ff4d4d] text-[#ff4d4d] p-3 text-[13px] mb-5 rounded">
-                  {errorMsg}
-                </div>
-              )}
+          </form>
+        )}
 
-              {step === 1 ? (
-                <form onSubmit={handleVerifyId} className="flex flex-col w-full">
-                  <div className="relative mb-6">
-                    <User className="absolute left-[15px] top-1/2 -translate-y-1/2 text-white/70 pointer-events-none" size={16} />
-                    <input 
-                      type="text" 
-                      placeholder="Student ID"
-                      value={studentId}
-                      onChange={(e) => setStudentId(e.target.value)}
-                      required
-                      className="w-full py-[15px] pl-[45px] pr-[15px] bg-white/5 border border-white/20 rounded-[10px] outline-none text-white text-[15px] transition-all focus:bg-white/10 focus:border-[#10af33] focus:shadow-[0_0_10px_rgba(16,175,51,0.3)] placeholder:text-white/60"
-                    />
-                  </div>
-                  <button 
-                    type="submit" 
-                    disabled={isVerifying}
-                    className="w-full bg-gradient-to-br from-[#10af33] to-[#0a8224] hover:from-[#12c73a] hover:to-[#0c9c2c] text-white font-semibold py-[15px] rounded-[10px] transition-all hover:-translate-y-1 shadow-[0_4px_15px_rgba(16,175,51,0.3)] hover:shadow-[0_6px_20px_rgba(16,175,51,0.5)] flex items-center justify-center"
-                  >
-                    {isVerifying ? <Loader2 className="animate-spin" size={20} /> : 'Next'}
-                  </button>
-                </form>
-              ) : (
-                <form onSubmit={handleLogin} className="flex flex-col w-full animate-fade-in-up">
-                  <div className="text-white font-medium text-center mb-[15px] mt-[15px] text-[16px] tracking-wide flex justify-center items-center">
-                    <CheckCircle className="text-[#4ade80] mr-2" size={18} /> Welcome, {displayName}!
-                  </div>
+        {/* About Section Overlay */}
+        {showAbout && (
+          <div className="absolute inset-0 bg-white/95 backdrop-blur-md rounded-2xl p-8 shadow-2xl border border-white/20 animate-fade-in z-10 flex flex-col justify-center text-center">
+            <button 
+              type="button"
+              className="absolute top-4 left-4 text-gray-500 hover:text-green-600 transition-colors flex items-center text-sm font-medium"
+              onClick={() => setShowAbout(false)}
+            >
+              <ArrowLeft size={16} className="mr-1" /> Back
+            </button>
+            <h2 className="text-2xl font-bold text-green-700 mb-4">About the System</h2>
+            <p className="text-gray-600 mb-6 text-sm leading-relaxed">
+              This Student Portal is a secure platform designed for Saint Patrick's Academy students, staff, and administrators to access important records, announcements, and schedules. 
+              <br/><br/>
+              Created with ❤️ by SPA IT Department.
+            </p>
+            <button
+              onClick={() => setShowAbout(false)}
+              className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors w-max mx-auto shadow-md"
+            >
+              Close
+            </button>
+          </div>
+        )}
 
-                  <div className="relative mb-6">
-                    <Lock className="absolute left-[15px] top-1/2 -translate-y-1/2 text-white/70 pointer-events-none" size={16} />
-                    <input 
-                      type={showPassword ? 'text' : 'password'} 
-                      placeholder="Password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                      autoFocus
-                      className="w-full py-[15px] pl-[45px] pr-[45px] bg-white/5 border border-white/20 rounded-[10px] outline-none text-white text-[15px] transition-all focus:bg-white/10 focus:border-[#10af33] focus:shadow-[0_0_10px_rgba(16,175,51,0.3)] placeholder:text-white/60"
-                    />
-                    <button 
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-[15px] top-1/2 -translate-y-1/2 text-white/70 hover:text-white p-2 transition-colors"
-                    >
-                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                    </button>
-                  </div>
-
-                  <button 
-                    type="submit" 
-                    disabled={isVerifying}
-                    className="w-full bg-gradient-to-br from-[#10af33] to-[#0a8224] hover:from-[#12c73a] hover:to-[#0c9c2c] text-white font-semibold py-[15px] rounded-[10px] transition-all hover:-translate-y-1 shadow-[0_4px_15px_rgba(16,175,51,0.3)] hover:shadow-[0_6px_20px_rgba(16,175,51,0.5)] flex items-center justify-center"
-                  >
-                    {isVerifying ? <Loader2 className="animate-spin" size={20} /> : 'Sign In'}
-                  </button>
-
-                  <div className="text-center mt-5">
-                    <button 
-                      type="button" 
-                      onClick={() => setStep(1)}
-                      className="text-white/80 hover:text-white hover:underline text-[14px] transition-all flex justify-center items-center w-full"
-                    >
-                      <ArrowLeft size={14} className="mr-2" /> Not you? Change ID
-                    </button>
-                  </div>
-                </form>
-              )}
-            </div>
-          )}
-        </div>
       </div>
-
-      {/* Footer Links */}
+      
       {!showAbout && (
-        <div className="absolute bottom-[30px] w-full text-center z-10 animate-fade-in-up">
+        <div className="absolute bottom-6 left-0 right-0 text-center">
           <button 
+            type="button"
+            className="text-white/80 hover:text-white transition-colors text-sm font-medium flex items-center justify-center mx-auto bg-black/30 px-4 py-2 rounded-full"
             onClick={() => setShowAbout(true)}
-            className="text-white/90 hover:text-white hover:underline font-medium text-[15px] drop-shadow-md transition-opacity"
           >
-            <Info size={14} className="inline mr-1" /> About Saint Patrick's Academy
+            <Info size={16} className="mr-2" /> About this Portal
           </button>
         </div>
       )}
