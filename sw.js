@@ -1,4 +1,4 @@
-const CACHE_NAME = 'spa-portal-v2'; // Bumped version
+const CACHE_NAME = 'spa-portal-v3'; // Bumped version to force update
 const urlsToCache = [
   '/',
   '/index.html',
@@ -29,6 +29,15 @@ self.addEventListener('activate', event => {
         })
       );
     }).then(() => self.clients.claim()) // Take control of all clients immediately
+      .then(() => {
+        // Force all currently open tabs to reload so they get the new updates immediately!
+        return self.clients.matchAll({ type: 'window' }).then(windowClients => {
+          for (let client of windowClients) {
+            // navigate() forces the browser to reload the page
+            client.navigate(client.url);
+          }
+        });
+      })
   );
 });
 

@@ -354,6 +354,15 @@
           }).catch(err => {
             console.log('ServiceWorker registration failed:', err);
           });
+
+          // Bulletproof automatic reload when a new version of the app is pushed
+          let refreshing = false;
+          navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (!refreshing) {
+              refreshing = true;
+              window.location.reload();
+            }
+          });
         });
       }
     </script>
