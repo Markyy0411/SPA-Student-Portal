@@ -176,15 +176,51 @@
             }
         }
 
+        // Auto-verify Student ID
+        studentIdInput.addEventListener('input', debounce(async function() {
+            const studentId = studentIdInput.value.trim();
+            if (studentId === '') {
+                studentNameDisplay.style.display = 'none';
+                return;
+            }
+
+            studentNameDisplay.style.display = 'block';
+            studentNameDisplay.style.color = '#555';
+            studentNameDisplay.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Checking ID...';
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'verifyId',
+                        student_id: studentId
+                    })
+                });
+                const result = await response.json();
+                
+                if (result.status === 'success' && result.name) {
+                    studentNameDisplay.style.color = '#10af33';
+                    studentNameDisplay.innerHTML = '<i class="fa-solid fa-check-circle"></i> Welcome, ' + result.name + '!';
+                } else {
+                    studentNameDisplay.style.color = '#e63946';
+                    studentNameDisplay.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> ID not found';
+                }
+            } catch (error) {
+                console.error("verifyId error:", error);
+                studentNameDisplay.style.color = '#e63946';
+                studentNameDisplay.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Network error';
+            }
+        }, 600));
+
         // Auto-verify when typing password
         passwordInput.addEventListener('input', debounce(function() {
             const studentId = studentIdInput.value.trim();
             const password = passwordInput.value.trim();
-            if (studentId !== '' && password.length > 2) {
+            if (studentId !== '' && password.length >= 4) {
                 // Auto trigger login check
                 attemptLogin(studentId, password);
             }
-        }, 1200)); // wait 1.2 seconds after they stop typing
+        }, 800)); // wait 0.8 seconds after they stop typing
 
         // Manual submit (if they click button or press enter before auto-verify)
         loginForm.addEventListener('submit', function(event) {
