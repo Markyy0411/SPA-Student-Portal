@@ -161,7 +161,14 @@ export default function StaffDashboard() {
     }
   };
 
-  if (!currentUser) return null;
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center font-sans">
+        <Loader2 className="animate-spin text-orange-600 w-12 h-12 mb-4" />
+        <p className="text-gray-500 font-medium">Loading portal...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
