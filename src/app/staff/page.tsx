@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Users, Bullhorn, LogOut, ArrowLeft, Loader2, UserCheck, Search } from 'lucide-react';
+import { LogOut, ClipboardList, PenTool, CreditCard, ArrowLeft, Loader2, Search } from 'lucide-react';
 import Swal from 'sweetalert2';
 
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz6cR-xROnKZME0Fu3CSxiyhYlt4gJgcxxx-Wu_DR9sT2d8H4mrPTtU4XM5GWXFjzfe/exec';
@@ -16,12 +16,10 @@ export default function StaffDashboard() {
   const [searchId, setSearchId] = useState('');
   const [studentData, setStudentData] = useState<any>(null);
   const [isSearching, setIsSearching] = useState(false);
-  
   const [announcementMsg, setAnnouncementMsg] = useState('');
   const [isPosting, setIsPosting] = useState(false);
   const [postStatus, setPostStatus] = useState('');
 
-  // Authentication check
   useEffect(() => {
     const userStr = localStorage.getItem('currentUser');
     if (!userStr) {
@@ -100,10 +98,12 @@ export default function StaffDashboard() {
       const result = await response.json();
       if (result.status === 'success') {
         saveBtn.innerText = "Saved ✓";
-        saveBtn.style.backgroundColor = "#1b5e20";
+        saveBtn.classList.remove('bg-orange-600', 'hover:bg-orange-700');
+        saveBtn.classList.add('bg-green-600', 'hover:bg-green-700');
         setTimeout(() => {
           saveBtn.innerText = "Save Changes";
-          saveBtn.style.backgroundColor = "";
+          saveBtn.classList.add('bg-orange-600', 'hover:bg-orange-700');
+          saveBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
           saveBtn.disabled = false;
         }, 2000);
       } else {
@@ -162,187 +162,195 @@ export default function StaffDashboard() {
   }
 
   return (
-    <div className="min-h-screen font-sans relative overflow-x-hidden text-gray-800">
+    <div className="min-h-screen font-sans relative overflow-x-hidden text-gray-100 flex flex-col">
       <div className="fixed inset-0 bg-[url('/bghome.jpg')] bg-cover bg-center bg-fixed -z-10"></div>
+      <div className="fixed inset-0 bg-black/40 backdrop-blur-[2px] -z-10"></div>
+      {/* Navbar (The Orange Header) */}
+      <nav className="bg-[#ea580c] text-white shadow-lg sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            <div className="flex items-center">
+              <ClipboardList className="h-8 w-8 mr-3 text-orange-200" />
+              <span className="font-bold text-xl tracking-tight">Staff Portal</span>
+            </div>
+            <div className="flex items-center space-x-4">
+              <span className="text-sm font-medium hidden sm:block">Hello, {currentUser.name || 'Staff'}</span>
+              <button 
+                onClick={handleLogout}
+                className="bg-orange-700 hover:bg-orange-800 px-4 py-2 rounded-lg font-medium transition-colors flex items-center shadow-inner"
+              >
+                <LogOut size={16} className="mr-2 hidden sm:block" /> Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
 
-      <div className="max-w-5xl mx-auto my-10 sm:my-20 px-4">
-        <div className="bg-white/90 backdrop-blur-[15px] rounded-[20px] p-6 sm:p-10 shadow-[0_8px_32px_rgba(0,0,0,0.2)] min-h-[500px]">
-          
-          <button 
-            onClick={handleLogout}
-            className="float-right bg-[#ff4d4d] hover:bg-[#e60000] text-white font-semibold py-2 px-4 sm:px-5 rounded-lg transition-colors text-sm sm:text-base"
-          >
-            Logout
-          </button>
+      {/* Main Content */}
+      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+        
+        {/* MAIN DASHBOARD */}
+        {activeView === 'dashboard' && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 animate-fade-in max-w-4xl">
+            
+            <div onClick={() => setActiveView('search')} className="bg-white/10 backdrop-blur-[15px] rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.2)] border border-white/20 text-white p-6 hover:shadow-md transition-shadow border-l-4 border-l-orange-500 cursor-pointer group">
+              <div className="bg-orange-500/20 w-14 h-14 rounded-xl flex items-center justify-center mb-4 text-orange-600">
+                <CreditCard size={28} />
+              </div>
+              <h2 className="text-xl font-bold text-white mb-2">Update Balances</h2>
+              <p className="text-gray-300 text-sm mb-4">Record payments and update student outstanding balances.</p>
+              <button className="text-orange-600 font-semibold text-sm group-hover:text-orange-800 transition-colors">Search Student &rarr;</button>
+            </div>
 
-          {/* MAIN DASHBOARD */}
-          {activeView === 'dashboard' && (
-            <div className="animate-fade-in mt-12 sm:mt-0">
-              <h1 className="text-2xl sm:text-3xl font-bold text-[#008751] mb-2 flex items-center">
-                <UserCheck className="mr-3" size={32} /> Staff Dashboard
-              </h1>
-              <p className="text-gray-700">Welcome, <span className="font-semibold">{currentUser.name || 'Staff'}</span>. Manage students and post announcements here.</p>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-8 max-w-2xl">
-                <div 
-                  onClick={() => setActiveView('search')}
-                  className="bg-white p-6 rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.05)] text-center border-t-4 border-[#008751] hover:-translate-y-1 transition-transform cursor-pointer"
-                >
-                  <Search size={35} className="text-[#008751] mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold mb-2">Search Student</h3>
-                  <p className="text-gray-600 text-sm">Find a student to update their balance and status.</p>
+            <div onClick={() => setActiveView('announcements')} className="bg-white/10 backdrop-blur-[15px] rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.2)] border border-white/20 text-white p-6 hover:shadow-md transition-shadow border-l-4 border-l-orange-500 cursor-pointer group">
+              <div className="bg-orange-500/20 w-14 h-14 rounded-xl flex items-center justify-center mb-4 text-orange-600">
+                <PenTool size={28} />
+              </div>
+              <h2 className="text-xl font-bold text-white mb-2">Post Announcements</h2>
+              <p className="text-gray-300 text-sm mb-4">Create, edit, or delete public announcements for students.</p>
+              <button className="text-orange-600 font-semibold text-sm group-hover:text-orange-800 transition-colors">New Announcement &rarr;</button>
+            </div>
+
+          </div>
+        )}
+
+        {/* SEARCH STUDENT VIEW */}
+        {activeView === 'search' && (
+          <div className="bg-white/10 backdrop-blur-[15px] rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.2)] border border-white/20 text-white p-6 sm:p-8 animate-fade-in max-w-3xl border-l-4 border-l-orange-500">
+            <button 
+              onClick={() => { setActiveView('dashboard'); setStudentData(null); setSearchId(''); }}
+              className="text-gray-300 hover:text-white font-medium mb-6 flex items-center transition-colors text-sm"
+            >
+              <ArrowLeft size={16} className="mr-2" /> Back to Dashboard
+            </button>
+            
+            <h2 className="text-2xl font-bold text-white mb-2 flex items-center">
+              <Search className="mr-3 text-orange-600" size={28} /> Search Student
+            </h2>
+            <p className="text-gray-300 mb-6">Enter a Student ID to view and edit their records.</p>
+            
+            <div className="flex flex-col sm:flex-row gap-3 max-w-md mb-8">
+              <input 
+                type="text" 
+                value={searchId}
+                onChange={(e) => setSearchId(e.target.value)}
+                placeholder="e.g. 2025-151" 
+                className="flex-1 p-3 border border-white/20 bg-black/20 text-white rounded-lg outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+              />
+              <button 
+                onClick={handleSearch}
+                disabled={isSearching}
+                className="bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center disabled:opacity-70"
+              >
+                {isSearching ? <Loader2 className="animate-spin mr-2" size={18}/> : null}
+                {isSearching ? 'Searching...' : 'Search'}
+              </button>
+            </div>
+
+            {studentData && (
+              <div className="bg-orange-500/20/50 p-6 sm:p-8 rounded-xl border border-orange-100 animate-fade-in">
+                <h3 className="text-xl font-bold text-white border-b border-orange-200 pb-3 mb-4">Student Record Found</h3>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8 mb-6 text-sm sm:text-base">
+                  <div>
+                    <span className="text-gray-300 block text-sm">Student ID</span>
+                    <strong className="text-white text-lg">{studentData.student_id}</strong>
+                  </div>
+                  <div>
+                    <span className="text-gray-300 block text-sm">Name</span>
+                    <strong className="text-white text-lg">{studentData.name || 'Not set'}</strong>
+                  </div>
+                  <div>
+                    <span className="text-gray-300 block text-sm">Grade/Section</span>
+                    <strong className="text-white">{studentData.section || 'N/A'}</strong>
+                  </div>
+                  <div>
+                    <span className="text-gray-300 block text-sm">Contact</span>
+                    <strong className="text-white">{studentData.contact || 'No record'}</strong>
+                  </div>
                 </div>
 
-                <div 
-                  onClick={() => setActiveView('announcements')}
-                  className="bg-white p-6 rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.05)] text-center border-t-4 border-[#008751] hover:-translate-y-1 transition-transform cursor-pointer"
-                >
-                  <Bullhorn size={35} className="text-[#008751] mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold mb-2">Post Announcement</h3>
-                  <p className="text-gray-600 text-sm">Post updates to the Student Portal feed.</p>
+                <div className="bg-white p-4 sm:p-5 rounded-lg border border-white/20 shadow-sm mt-4">
+                  <h4 className="font-semibold text-gray-200 mb-4">Update Financial Status</h4>
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="flex-1">
+                      <label className="block text-sm text-gray-300 mb-1">Outstanding Balance (₱)</label>
+                      <input 
+                        type="number" 
+                        id={`balance-${studentData.student_id}`}
+                        defaultValue={studentData.balance || 0}
+                        className="w-full p-2.5 border border-white/20 bg-black/20 text-white rounded outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <label className="block text-sm text-gray-300 mb-1">Status</label>
+                      <select 
+                        id={`status-${studentData.student_id}`}
+                        defaultValue={studentData.status_val || 'Pending'}
+                        className="w-full p-2.5 border border-white/20 bg-black/20 text-white rounded outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+                      >
+                        <option className="text-black" value="Pending">Pending</option>
+                        <option className="text-black" value="Paid">Paid</option>
+                        <option className="text-black" value="Unpaid">Unpaid</option>
+                      </select>
+                    </div>
+                  </div>
+                  <button 
+                    id={`savebtn-${studentData.student_id}`}
+                    onClick={() => handleUpdateStudent(studentData.student_id, studentData.balance, studentData.status_val)}
+                    className="mt-5 w-full sm:w-auto bg-orange-600 hover:bg-orange-700 text-white font-semibold py-2.5 px-8 rounded transition-colors"
+                  >
+                    Save Changes
+                  </button>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
+        )}
 
-          {/* SEARCH STUDENT VIEW */}
-          {activeView === 'search' && (
-            <div className="animate-fade-in">
+        {/* ANNOUNCEMENTS VIEW */}
+        {activeView === 'announcements' && (
+          <div className="bg-white/10 backdrop-blur-[15px] rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.2)] border border-white/20 text-white p-6 sm:p-8 animate-fade-in max-w-3xl border-l-4 border-l-orange-500">
+            <button 
+              onClick={() => setActiveView('dashboard')}
+              className="text-gray-300 hover:text-white font-medium mb-6 flex items-center transition-colors text-sm"
+            >
+              <ArrowLeft size={16} className="mr-2" /> Back to Dashboard
+            </button>
+            
+            <h2 className="text-2xl font-bold text-white mb-2 flex items-center">
+              <PenTool className="mr-3 text-orange-600" size={28} /> Post Announcement
+            </h2>
+            <p className="text-gray-300 mb-6">Write an announcement below. It will instantly appear on the Student Portal feed.</p>
+            
+            <div className="space-y-4">
+              <label className="block font-semibold text-white mb-1">Announcement Message:</label>
+              <textarea 
+                value={announcementMsg}
+                onChange={(e) => setAnnouncementMsg(e.target.value)}
+                placeholder="Type your message here..."
+                className="w-full h-40 p-4 border border-white/20 bg-black/20 text-white rounded-lg outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 resize-y"
+              ></textarea>
+              
               <button 
-                onClick={() => { setActiveView('dashboard'); setStudentData(null); setSearchId(''); }}
-                className="bg-gray-600 hover:bg-gray-800 text-white font-semibold py-2 px-4 rounded-lg mb-6 flex items-center transition-colors text-sm sm:text-base"
+                onClick={handlePostAnnouncement}
+                disabled={isPosting}
+                className="bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center disabled:opacity-70 w-full sm:w-auto justify-center"
               >
-                <ArrowLeft size={16} className="mr-2" /> Back to Dashboard
+                {isPosting ? <Loader2 className="animate-spin mr-2" size={18}/> : null}
+                {isPosting ? 'Posting...' : 'Post to Feed'}
               </button>
               
-              <h2 className="text-xl sm:text-2xl font-bold text-[#008751] mb-2 flex items-center">
-                <Search className="mr-3" size={28} /> Search Student
-              </h2>
-              <p className="text-gray-700 mb-6 text-sm sm:text-base">Enter a Student ID to view and edit their records.</p>
-              
-              <div className="flex flex-col sm:flex-row gap-3 max-w-md mb-8">
-                <input 
-                  type="text" 
-                  value={searchId}
-                  onChange={(e) => setSearchId(e.target.value)}
-                  placeholder="e.g. 2025-151" 
-                  className="flex-1 p-3 border border-gray-300 rounded-lg outline-none focus:border-[#008751]"
-                />
-                <button 
-                  onClick={handleSearch}
-                  disabled={isSearching}
-                  className="bg-[#008751] hover:bg-[#00683f] text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center disabled:opacity-70"
-                >
-                  {isSearching ? <Loader2 className="animate-spin mr-2" size={18}/> : null}
-                  {isSearching ? 'Searching...' : 'Search'}
-                </button>
-              </div>
-
-              {studentData && (
-                <div className="bg-white p-6 sm:p-8 rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.05)] border-l-4 border-[#008751] max-w-2xl animate-fade-in">
-                  <h3 className="text-xl font-bold text-gray-800 border-b border-gray-100 pb-3 mb-4">Student Record Found</h3>
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8 mb-6 text-sm sm:text-base">
-                    <div>
-                      <span className="text-gray-500 block text-sm">Student ID</span>
-                      <strong className="text-gray-900 text-lg">{studentData.student_id}</strong>
-                    </div>
-                    <div>
-                      <span className="text-gray-500 block text-sm">Name</span>
-                      <strong className="text-gray-900 text-lg">{studentData.name || 'Not set'}</strong>
-                    </div>
-                    <div>
-                      <span className="text-gray-500 block text-sm">Grade/Section</span>
-                      <strong className="text-gray-900">{studentData.section || 'N/A'}</strong>
-                    </div>
-                    <div>
-                      <span className="text-gray-500 block text-sm">Contact</span>
-                      <strong className="text-gray-900">{studentData.contact || 'No record'}</strong>
-                    </div>
-                  </div>
-
-                  <div className="bg-gray-50 p-4 sm:p-5 rounded-lg border border-gray-200">
-                    <h4 className="font-semibold text-gray-700 mb-4">Update Financial Status</h4>
-                    <div className="flex flex-col sm:flex-row gap-4">
-                      <div className="flex-1">
-                        <label className="block text-sm text-gray-600 mb-1">Outstanding Balance (₱)</label>
-                        <input 
-                          type="number" 
-                          id={`balance-${studentData.student_id}`}
-                          defaultValue={studentData.balance || 0}
-                          className="w-full p-2.5 border border-gray-300 rounded outline-none focus:border-[#008751]"
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <label className="block text-sm text-gray-600 mb-1">Status</label>
-                        <select 
-                          id={`status-${studentData.student_id}`}
-                          defaultValue={studentData.status_val || 'Pending'}
-                          className="w-full p-2.5 border border-gray-300 rounded outline-none focus:border-[#008751]"
-                        >
-                          <option value="Pending">Pending</option>
-                          <option value="Paid">Paid</option>
-                          <option value="Unpaid">Unpaid</option>
-                        </select>
-                      </div>
-                    </div>
-                    <button 
-                      id={`savebtn-${studentData.student_id}`}
-                      onClick={() => handleUpdateStudent(studentData.student_id, studentData.balance, studentData.status_val)}
-                      className="mt-5 w-full sm:w-auto bg-[#008751] hover:bg-[#00683f] text-white font-semibold py-2.5 px-8 rounded transition-colors"
-                    >
-                      Save Changes
-                    </button>
-                  </div>
-                </div>
+              {postStatus && (
+                <p className={`mt-2 font-medium ${postStatus.includes('Error') ? 'text-red-600' : 'text-orange-600'}`}>
+                  {postStatus}
+                </p>
               )}
             </div>
-          )}
-
-          {/* ANNOUNCEMENTS VIEW */}
-          {activeView === 'announcements' && (
-            <div className="animate-fade-in">
-              <button 
-                onClick={() => setActiveView('dashboard')}
-                className="bg-gray-600 hover:bg-gray-800 text-white font-semibold py-2 px-4 rounded-lg mb-6 flex items-center transition-colors text-sm sm:text-base"
-              >
-                <ArrowLeft size={16} className="mr-2" /> Back to Dashboard
-              </button>
-              
-              <h2 className="text-xl sm:text-2xl font-bold text-[#008751] mb-2 flex items-center">
-                <Bullhorn className="mr-3" size={28} /> Post Announcement
-              </h2>
-              <p className="text-gray-700 mb-6 text-sm sm:text-base">Write an announcement below. It will instantly appear on the Student Portal feed.</p>
-              
-              <div className="max-w-2xl">
-                <label className="block font-semibold mb-2">Announcement Message:</label>
-                <textarea 
-                  value={announcementMsg}
-                  onChange={(e) => setAnnouncementMsg(e.target.value)}
-                  placeholder="Type your message here..."
-                  className="w-full h-40 p-4 border border-gray-300 rounded-lg outline-none focus:border-[#008751] focus:ring-1 focus:ring-[#008751] resize-y mb-4"
-                ></textarea>
-                
-                <button 
-                  onClick={handlePostAnnouncement}
-                  disabled={isPosting}
-                  className="bg-[#10af33] hover:bg-[#0c9c2c] text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center sm:justify-start w-full sm:w-auto disabled:opacity-70"
-                >
-                  {isPosting ? <Loader2 className="animate-spin mr-2" size={18}/> : null}
-                  {isPosting ? 'Posting...' : 'Post to Feed'}
-                </button>
-                
-                {postStatus && (
-                  <p className={`mt-4 font-medium text-center sm:text-left ${postStatus.includes('Error') ? 'text-red-500' : 'text-[#008751]'}`}>
-                    {postStatus}
-                  </p>
-                )}
-              </div>
-            </div>
-          )}
-          
-        </div>
-      </div>
+          </div>
+        )}
+        
+      </main>
     </div>
   );
 }
