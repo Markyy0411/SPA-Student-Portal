@@ -47,6 +47,10 @@
                 <button type="submit" class="Login-button">Sign In</button>
             </form>
         </div>
+
+        <div class="footer-links">
+            <a href="#" id="aboutSchoolBtn"><i class="fa-solid fa-circle-info"></i> About Saint Patrick's Academy</a>
+        </div>
     </div>
 
     <!-- JavaScript for Form Validation and Password Toggle -->
@@ -163,6 +167,32 @@
                 loginBtn.textContent = 'Sign In';
                 loginBtn.disabled = false;
             }
+        });
+
+        // About School Modal
+        document.getElementById('aboutSchoolBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            Swal.fire({
+                title: '<strong>Saint Patrick\'s Academy</strong>',
+                html: `
+                    <div style="text-align: left; padding: 10px;">
+                        <p style="font-size: 15px;"><strong><i class="fa-solid fa-location-dot"></i> Location:</strong> Dingalan, Aurora</p>
+                        <p style="font-size: 15px; margin-top: 5px;"><strong><i class="fa-solid fa-calendar-days"></i> Founded:</strong> 1968</p>
+                        <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+                        <h4 style="color: #008751; margin-bottom: 5px;"><i class="fa-solid fa-eye"></i> Vision</h4>
+                        <p style="font-size: 14px; color: #555;">To provide holistic formation for students inspired by the Blessed Trinity and in communion with the family, church, and community.</p>
+                        <h4 style="color: #008751; margin-bottom: 5px; margin-top: 15px;"><i class="fa-solid fa-bullseye"></i> Mission</h4>
+                        <p style="font-size: 14px; color: #555;">Following Jesus Christ through living the Carmelian spirit of prayer, compassion, and prophetic action to provide quality education for the church and society.</p>
+                    </div>
+                `,
+                confirmButtonText: 'Close',
+                confirmButtonColor: '#008751',
+                width: '600px',
+                padding: '20px',
+                color: '#333',
+                background: '#fff',
+                backdrop: `rgba(0,0,0,0.6)`
+            });
         });
     </script>
     <script>
