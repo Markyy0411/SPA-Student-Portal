@@ -45,11 +45,19 @@ export default function LoginPage() {
     setIsVerifying(true);
     setErrorMsg('');
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 25000);
+
     try {
       const response = await fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
+        signal: controller.signal,
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8',
+        },
         body: JSON.stringify({ action: 'verifyId', student_id: studentId })
       });
+      clearTimeout(timeoutId);
       const data = await response.json();
       
       if (data.status === 'success') {
@@ -59,7 +67,11 @@ export default function LoginPage() {
         setErrorMsg('Student ID not found.');
       }
     } catch (error: any) {
-      setErrorMsg('Network error verifying ID.');
+      if (error.name === 'AbortError') {
+        setErrorMsg('Server took too long. Please try again.');
+      } else {
+        setErrorMsg('Network error verifying ID. Please check your connection.');
+      }
     } finally {
       setIsVerifying(false);
     }
@@ -72,11 +84,19 @@ export default function LoginPage() {
     setIsVerifying(true);
     setErrorMsg('');
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 25000);
+
     try {
       const response = await fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
+        signal: controller.signal,
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8',
+        },
         body: JSON.stringify({ action: 'login', student_id: studentId, password: password })
       });
+      clearTimeout(timeoutId);
       const data = await response.json();
       
       if (data.status === 'success') {
@@ -108,7 +128,11 @@ export default function LoginPage() {
         setErrorMsg(data.message || 'Incorrect Password');
       }
     } catch (error: any) {
-      setErrorMsg('Network Error. Please check your connection.');
+      if (error.name === 'AbortError') {
+        setErrorMsg('Server took too long. Please try again.');
+      } else {
+        setErrorMsg('Network Error. Please check your connection.');
+      }
     } finally {
       setIsVerifying(false);
     }

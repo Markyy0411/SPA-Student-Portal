@@ -41,6 +41,9 @@ export default function StudentDashboard() {
     try {
       const response = await fetch(SCRIPT_URL, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8',
+        },
         body: JSON.stringify({ action: 'fetch_announcements' })
       });
       const result = await response.json();
