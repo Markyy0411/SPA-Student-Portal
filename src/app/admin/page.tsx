@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Users, Bullhorn, Settings, LogOut, ArrowLeft, Loader2, UserShield } from 'lucide-react';
+import { LogOut, Users, Settings, ShieldCheck, Bullhorn, ArrowLeft, Loader2 } from 'lucide-react';
 import Swal from 'sweetalert2';
 
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz6cR-xROnKZME0Fu3CSxiyhYlt4gJgcxxx-Wu_DR9sT2d8H4mrPTtU4XM5GWXFjzfe/exec';
@@ -19,7 +19,6 @@ export default function AdminDashboard() {
   const [isPosting, setIsPosting] = useState(false);
   const [postStatus, setPostStatus] = useState('');
 
-  // Authentication check
   useEffect(() => {
     const userStr = localStorage.getItem('currentUser');
     if (!userStr) {
@@ -52,7 +51,6 @@ export default function AdminDashboard() {
       });
       const result = await response.json();
       if (result.status === 'success') {
-        // Filter out empty rows and non-students
         setUsers(result.data.filter((u: any) => u.student_id && u.role === 'student'));
       } else {
         Swal.fire('Error', result.message || 'Could not load data', 'error');
@@ -147,234 +145,240 @@ export default function AdminDashboard() {
   if (!currentUser) return null;
 
   return (
-    <div className="min-h-screen font-sans relative overflow-x-hidden text-gray-800">
-      <div className="fixed inset-0 bg-[url('/bghome.jpg')] bg-cover bg-center bg-fixed -z-10"></div>
-
-      <div className="max-w-5xl mx-auto my-20 px-4">
-        <div className="bg-white/90 backdrop-blur-[15px] rounded-[20px] p-6 sm:p-10 shadow-[0_8px_32px_rgba(0,0,0,0.2)] min-h-[500px]">
-          
-          <button 
-            onClick={handleLogout}
-            className="float-right bg-[#ff4d4d] hover:bg-[#e60000] text-white font-semibold py-2 px-5 rounded-lg transition-colors"
-          >
-            Logout
-          </button>
-
-          {/* MAIN DASHBOARD */}
-          {activeView === 'dashboard' && (
-            <div className="animate-fade-in">
-              <h1 className="text-3xl font-bold text-[#008751] mb-2 flex items-center">
-                <UserShield className="mr-3" size={32} /> Admin Dashboard
-              </h1>
-              <p className="text-gray-700">Welcome, <span className="font-semibold">{currentUser.name || 'Administrator'}</span>. You have full system access.</p>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mt-8">
-                <div 
-                  onClick={() => { setActiveView('users'); loadUsers(); }}
-                  className="bg-white p-6 rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.05)] text-center border-t-4 border-[#008751] hover:-translate-y-1 transition-transform cursor-pointer"
-                >
-                  <Users size={35} className="text-[#008751] mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold mb-2">Manage Users</h3>
-                  <p className="text-gray-600 text-sm">View students and securely edit their balances.</p>
-                </div>
-
-                <div 
-                  onClick={() => setActiveView('announcements')}
-                  className="bg-white p-6 rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.05)] text-center border-t-4 border-[#008751] hover:-translate-y-1 transition-transform cursor-pointer"
-                >
-                  <Bullhorn size={35} className="text-[#008751] mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold mb-2">Global Announcements</h3>
-                  <p className="text-gray-600 text-sm">Post important announcements to all portals.</p>
-                </div>
-
-                <div 
-                  onClick={() => setActiveView('settings')}
-                  className="bg-white p-6 rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.05)] text-center border-t-4 border-[#008751] hover:-translate-y-1 transition-transform cursor-pointer"
-                >
-                  <Settings size={35} className="text-[#008751] mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold mb-2">System Settings</h3>
-                  <p className="text-gray-600 text-sm">Configure portal options and security.</p>
-                </div>
-              </div>
+    <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
+      {/* Navbar (The Blue Header) */}
+      <nav className="bg-[#1d4ed8] text-white shadow-lg sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            <div className="flex items-center">
+              <ShieldCheck className="h-8 w-8 mr-3 text-blue-200" />
+              <span className="font-bold text-xl tracking-tight">Admin Console</span>
             </div>
-          )}
-
-          {/* MANAGE USERS VIEW */}
-          {activeView === 'users' && (
-            <div className="animate-fade-in">
+            <div className="flex items-center space-x-4">
+              <span className="text-sm font-medium hidden sm:block">Welcome, {currentUser.name || 'Administrator'}</span>
               <button 
-                onClick={() => setActiveView('dashboard')}
-                className="bg-gray-600 hover:bg-gray-800 text-white font-semibold py-2 px-4 rounded-lg mb-6 flex items-center transition-colors"
+                onClick={handleLogout}
+                className="bg-blue-700 hover:bg-blue-600 px-4 py-2 rounded-lg font-medium transition-colors flex items-center shadow-inner"
               >
-                <ArrowLeft size={16} className="mr-2" /> Back to Dashboard
+                <LogOut size={16} className="mr-2 hidden sm:block" /> Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Main Content */}
+      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+        
+        {/* MAIN DASHBOARD */}
+        {activeView === 'dashboard' && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
+            
+            <div onClick={() => { setActiveView('users'); loadUsers(); }} className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer group">
+              <div className="bg-blue-50 w-14 h-14 rounded-xl flex items-center justify-center mb-4 text-blue-600">
+                <Users size={28} />
+              </div>
+              <h2 className="text-xl font-bold text-gray-900 mb-2">User Management</h2>
+              <p className="text-gray-500 text-sm mb-4">View, edit, or remove student and staff accounts. Reset passwords.</p>
+              <button className="text-blue-600 font-semibold text-sm group-hover:text-blue-800 transition-colors">Manage Users &rarr;</button>
+            </div>
+
+            <div onClick={() => setActiveView('announcements')} className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer group">
+              <div className="bg-green-50 w-14 h-14 rounded-xl flex items-center justify-center mb-4 text-green-600">
+                <Bullhorn size={28} />
+              </div>
+              <h2 className="text-xl font-bold text-gray-900 mb-2">Global Announcements</h2>
+              <p className="text-gray-500 text-sm mb-4">Post important announcements and updates to all student and staff portals.</p>
+              <button className="text-green-600 font-semibold text-sm group-hover:text-green-800 transition-colors">Post Announcement &rarr;</button>
+            </div>
+
+            <div onClick={() => setActiveView('settings')} className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer group">
+              <div className="bg-gray-100 w-14 h-14 rounded-xl flex items-center justify-center mb-4 text-gray-600">
+                <Settings size={28} />
+              </div>
+              <h2 className="text-xl font-bold text-gray-900 mb-2">System Settings</h2>
+              <p className="text-gray-500 text-sm mb-4">Configure global portal settings, maintenance mode, and logs.</p>
+              <button className="text-gray-600 font-semibold text-sm group-hover:text-gray-800 transition-colors">View Settings &rarr;</button>
+            </div>
+
+          </div>
+        )}
+
+        {/* MANAGE USERS VIEW */}
+        {activeView === 'users' && (
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8 animate-fade-in">
+            <button 
+              onClick={() => setActiveView('dashboard')}
+              className="text-gray-500 hover:text-gray-800 font-medium mb-6 flex items-center transition-colors text-sm"
+            >
+              <ArrowLeft size={16} className="mr-2" /> Back to Dashboard
+            </button>
+            
+            <h2 className="text-2xl font-bold text-gray-900 mb-2 flex items-center">
+              <Users className="mr-3 text-blue-600" size={28} /> Manage Users
+            </h2>
+            <p className="text-gray-600 mb-6">Edit student balances and status below. Changes will save directly to your Google Sheet.</p>
+            
+            {isLoadingUsers ? (
+              <p className="text-blue-600 italic flex items-center"><Loader2 className="animate-spin mr-2" size={16}/> Loading users securely from database...</p>
+            ) : (
+              <div className="overflow-x-auto rounded-lg border border-gray-200">
+                <table className="w-full text-left border-collapse min-w-[800px]">
+                  <thead>
+                    <tr className="bg-gray-50 text-gray-700">
+                      <th className="p-3 font-semibold border-b">Student ID</th>
+                      <th className="p-3 font-semibold border-b">Name</th>
+                      <th className="p-3 font-semibold border-b">Contact #</th>
+                      <th className="p-3 font-semibold border-b">Role</th>
+                      <th className="p-3 font-semibold border-b">Balance (₱)</th>
+                      <th className="p-3 font-semibold border-b">Status</th>
+                      <th className="p-3 font-semibold border-b">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {users.map(user => (
+                      <tr key={user.student_id} id={`row-${user.student_id}`} className="border-b border-gray-100 hover:bg-gray-50">
+                        <td className="p-3 font-medium text-gray-900">{user.student_id}</td>
+                        <td className="p-3 text-gray-600">{user.name || <i className="text-gray-400">Not set</i>}</td>
+                        <td className="p-3 text-gray-600">{user.contact || <i className="text-gray-400">No record</i>}</td>
+                        <td className="p-3 capitalize text-gray-600">{user.role}</td>
+                        <td className="p-3">
+                          <input 
+                            type="number" 
+                            className="balance-input border border-gray-300 rounded px-2 py-1.5 w-24 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                            defaultValue={user.balance || 0}
+                          />
+                        </td>
+                        <td className="p-3">
+                          <select 
+                            className="status-select border border-gray-300 rounded px-2 py-1.5 w-28 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                            defaultValue={user.status_val || 'Pending'}
+                          >
+                            <option value="Pending">Pending</option>
+                            <option value="Paid">Paid</option>
+                            <option value="Unpaid">Unpaid</option>
+                          </select>
+                        </td>
+                        <td className="p-3">
+                          <button 
+                            className="save-btn bg-blue-600 hover:bg-blue-700 text-white font-medium py-1.5 px-4 rounded transition-colors"
+                            onClick={() => handleUpdateUser(user.student_id, user.balance, user.status_val)}
+                          >
+                            Save
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                    {users.length === 0 && (
+                      <tr>
+                        <td colSpan={7} className="p-4 text-center text-gray-500">No students found.</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ANNOUNCEMENTS VIEW */}
+        {activeView === 'announcements' && (
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8 animate-fade-in max-w-3xl">
+            <button 
+              onClick={() => setActiveView('dashboard')}
+              className="text-gray-500 hover:text-gray-800 font-medium mb-6 flex items-center transition-colors text-sm"
+            >
+              <ArrowLeft size={16} className="mr-2" /> Back to Dashboard
+            </button>
+            
+            <h2 className="text-2xl font-bold text-gray-900 mb-2 flex items-center">
+              <Bullhorn className="mr-3 text-green-600" size={28} /> Post Announcement
+            </h2>
+            <p className="text-gray-600 mb-6">Write an announcement below. It will instantly appear on the Student Portal feed.</p>
+            
+            <div className="space-y-4">
+              <label className="block font-semibold text-gray-800 mb-1">Announcement Message:</label>
+              <textarea 
+                value={announcementMsg}
+                onChange={(e) => setAnnouncementMsg(e.target.value)}
+                placeholder="Type your message here..."
+                className="w-full h-40 p-4 border border-gray-300 rounded-lg outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 resize-y"
+              ></textarea>
+              
+              <button 
+                onClick={handlePostAnnouncement}
+                disabled={isPosting}
+                className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center disabled:opacity-70 w-full sm:w-auto justify-center"
+              >
+                {isPosting ? <Loader2 className="animate-spin mr-2" size={18}/> : null}
+                {isPosting ? 'Posting...' : 'Post to Feed'}
               </button>
               
-              <h2 className="text-2xl font-bold text-[#008751] mb-2 flex items-center">
-                <Users className="mr-3" size={28} /> Manage Users
-              </h2>
-              <p className="text-gray-700 mb-6">Edit student balances and status below. Changes will save directly to your Google Sheet.</p>
-              
-              {isLoadingUsers ? (
-                <p className="text-gray-500 italic flex items-center"><Loader2 className="animate-spin mr-2" size={16}/> Loading users securely from database...</p>
-              ) : (
-                <div className="overflow-x-auto bg-white rounded-lg shadow-sm border border-gray-100">
-                  <table className="w-full text-left border-collapse min-w-[800px]">
-                    <thead>
-                      <tr className="bg-[#008751] text-white">
-                        <th className="p-3 font-medium">Student ID</th>
-                        <th className="p-3 font-medium">Name</th>
-                        <th className="p-3 font-medium">Contact #</th>
-                        <th className="p-3 font-medium">Role</th>
-                        <th className="p-3 font-medium">Balance (₱)</th>
-                        <th className="p-3 font-medium">Status</th>
-                        <th className="p-3 font-medium">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {users.map(user => (
-                        <tr key={user.student_id} id={`row-${user.student_id}`} className="border-b border-gray-100 hover:bg-gray-50">
-                          <td className="p-3 font-bold">{user.student_id}</td>
-                          <td className="p-3">{user.name || <i className="text-gray-400">Not set</i>}</td>
-                          <td className="p-3">{user.contact || <i className="text-gray-400">No record</i>}</td>
-                          <td className="p-3 capitalize">{user.role}</td>
-                          <td className="p-3">
-                            <input 
-                              type="number" 
-                              className="balance-input border border-gray-300 rounded px-2 py-1.5 w-24 outline-none focus:border-[#008751]"
-                              defaultValue={user.balance || 0}
-                            />
-                          </td>
-                          <td className="p-3">
-                            <select 
-                              className="status-select border border-gray-300 rounded px-2 py-1.5 w-28 outline-none focus:border-[#008751]"
-                              defaultValue={user.status_val || 'Pending'}
-                            >
-                              <option value="Pending">Pending</option>
-                              <option value="Paid">Paid</option>
-                              <option value="Unpaid">Unpaid</option>
-                            </select>
-                          </td>
-                          <td className="p-3">
-                            <button 
-                              className="save-btn bg-[#008751] hover:bg-[#00683f] text-white font-medium py-1.5 px-4 rounded transition-colors"
-                              onClick={() => handleUpdateUser(user.student_id, user.balance, user.status_val)}
-                            >
-                              Save
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                      {users.length === 0 && (
-                        <tr>
-                          <td colSpan={7} className="p-4 text-center text-gray-500">No students found.</td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
+              {postStatus && (
+                <p className={`mt-2 font-medium ${postStatus.includes('Error') ? 'text-red-600' : 'text-green-600'}`}>
+                  {postStatus}
+                </p>
               )}
             </div>
-          )}
+          </div>
+        )}
 
-          {/* ANNOUNCEMENTS VIEW */}
-          {activeView === 'announcements' && (
-            <div className="animate-fade-in">
-              <button 
-                onClick={() => setActiveView('dashboard')}
-                className="bg-gray-600 hover:bg-gray-800 text-white font-semibold py-2 px-4 rounded-lg mb-6 flex items-center transition-colors"
-              >
-                <ArrowLeft size={16} className="mr-2" /> Back to Dashboard
-              </button>
+        {/* SETTINGS VIEW */}
+        {activeView === 'settings' && (
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8 animate-fade-in max-w-3xl">
+            <button 
+              onClick={() => setActiveView('dashboard')}
+              className="text-gray-500 hover:text-gray-800 font-medium mb-6 flex items-center transition-colors text-sm"
+            >
+              <ArrowLeft size={16} className="mr-2" /> Back to Dashboard
+            </button>
+            
+            <h2 className="text-2xl font-bold text-gray-900 mb-2 flex items-center">
+              <Settings className="mr-3 text-gray-600" size={28} /> System Settings
+            </h2>
+            <p className="text-gray-600 mb-6">Configure global portal options.</p>
+            
+            <div className="space-y-6">
               
-              <h2 className="text-2xl font-bold text-[#008751] mb-2 flex items-center">
-                <Bullhorn className="mr-3" size={28} /> Post Announcement
-              </h2>
-              <p className="text-gray-700 mb-6">Write an announcement below. It will instantly appear on the Student Portal feed.</p>
-              
-              <div className="max-w-2xl">
-                <label className="block font-semibold mb-2">Announcement Message:</label>
-                <textarea 
-                  value={announcementMsg}
-                  onChange={(e) => setAnnouncementMsg(e.target.value)}
-                  placeholder="Type your message here..."
-                  className="w-full h-40 p-4 border border-gray-300 rounded-lg outline-none focus:border-[#008751] focus:ring-1 focus:ring-[#008751] resize-y mb-4"
-                ></textarea>
-                
-                <button 
-                  onClick={handlePostAnnouncement}
-                  disabled={isPosting}
-                  className="bg-[#10af33] hover:bg-[#0c9c2c] text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center disabled:opacity-70"
-                >
-                  {isPosting ? <Loader2 className="animate-spin mr-2" size={18}/> : null}
-                  {isPosting ? 'Posting...' : 'Post to Feed'}
-                </button>
-                
-                {postStatus && (
-                  <p className={`mt-4 font-medium ${postStatus.includes('Error') ? 'text-red-500' : 'text-[#008751]'}`}>
-                    {postStatus}
-                  </p>
-                )}
+              <div className="flex justify-between items-center py-4 border-b border-gray-100">
+                <div className="pr-4">
+                  <strong className="text-gray-800 block">Maintenance Mode</strong>
+                  <p className="text-sm text-gray-500 mt-1">Temporarily disable logins for all users except Admins.</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer flex-shrink-0">
+                  <input type="checkbox" className="sr-only peer" />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
               </div>
-            </div>
-          )}
-
-          {/* SETTINGS VIEW */}
-          {activeView === 'settings' && (
-            <div className="animate-fade-in">
-              <button 
-                onClick={() => setActiveView('dashboard')}
-                className="bg-gray-600 hover:bg-gray-800 text-white font-semibold py-2 px-4 rounded-lg mb-6 flex items-center transition-colors"
-              >
-                <ArrowLeft size={16} className="mr-2" /> Back to Dashboard
-              </button>
               
-              <h2 className="text-2xl font-bold text-[#008751] mb-2 flex items-center">
-                <Settings className="mr-3" size={28} /> System Settings
-              </h2>
-              <p className="text-gray-700 mb-6">Configure global portal options.</p>
-              
-              <div className="bg-white p-8 rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.05)] max-w-2xl">
-                
-                <div className="flex justify-between items-center py-4 border-b border-gray-100">
-                  <div>
-                    <strong className="text-gray-800">Maintenance Mode</strong>
-                    <p className="text-sm text-gray-500 mt-1">Temporarily disable logins for all users except Admins.</p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" className="sr-only peer" />
-                    <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#008751]"></div>
-                  </label>
+              <div className="flex justify-between items-center py-4 border-b border-gray-100">
+                <div className="pr-4">
+                  <strong className="text-gray-800 block">Allow Student Registration</strong>
+                  <p className="text-sm text-gray-500 mt-1">Allow new students to create an account from the login page.</p>
                 </div>
-                
-                <div className="flex justify-between items-center py-4 border-b border-gray-100">
-                  <div>
-                    <strong className="text-gray-800">Allow Student Registration</strong>
-                    <p className="text-sm text-gray-500 mt-1">Allow new students to create an account from the login page.</p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" className="sr-only peer" defaultChecked />
-                    <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#008751]"></div>
-                  </label>
-                </div>
-                
-                <div className="flex justify-between items-center py-4">
-                  <div>
-                    <strong className="text-gray-800">Email Notifications</strong>
-                    <p className="text-sm text-gray-500 mt-1">Send automated emails when balances are updated.</p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" className="sr-only peer" />
-                    <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#008751]"></div>
-                  </label>
-                </div>
-
+                <label className="relative inline-flex items-center cursor-pointer flex-shrink-0">
+                  <input type="checkbox" className="sr-only peer" defaultChecked />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
               </div>
-              <p className="mt-4 text-gray-500 text-sm italic">Note: Settings are currently in preview mode.</p>
+              
+              <div className="flex justify-between items-center py-4">
+                <div className="pr-4">
+                  <strong className="text-gray-800 block">Email Notifications</strong>
+                  <p className="text-sm text-gray-500 mt-1">Send automated emails when balances are updated.</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer flex-shrink-0">
+                  <input type="checkbox" className="sr-only peer" />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+              </div>
+
             </div>
-          )}
-          
-        </div>
-      </div>
+            <p className="mt-8 text-gray-400 text-sm italic">Note: Settings are currently in preview mode.</p>
+          </div>
+        )}
+        
+      </main>
     </div>
   );
 }
