@@ -33,20 +33,29 @@
                 
                 <div class="error-msg" id="errorMessage" style="display: none;">Invalid credentials</div>
 
-                <div class="input-group">
-                    <i class="fa-solid fa-user"></i>
-                    <input type="text" id="studentId" placeholder="Student ID" required>
+                <div id="step1Container">
+                    <div class="input-group">
+                        <i class="fa-solid fa-user"></i>
+                        <input type="text" id="studentId" placeholder="Student ID" required>
+                    </div>
+                    <button type="button" class="Login-button" id="nextBtn" style="margin-top: 5px;">Next</button>
                 </div>
                 
-                <div id="studentNameDisplay" style="color: #10af33; font-weight: 600; text-align: center; margin-bottom: 15px; display: none; font-size: 15px;"></div>
+                <div id="studentNameDisplay" style="color: #10af33; font-weight: 600; text-align: center; margin-bottom: 15px; margin-top: 15px; display: none; font-size: 15px;"></div>
 
-                <div class="input-group">
-                    <i class="fa-solid fa-lock"></i>
-                    <input type="password" id="password" placeholder="Password" required>
-                    <i class="fa-solid fa-eye toggle-password" id="togglePassword"></i>
+                <div id="step2Container" style="display: none; transition: all 0.5s ease;">
+                    <div class="input-group">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="password" placeholder="Password">
+                        <i class="fa-solid fa-eye toggle-password" id="togglePassword"></i>
+                    </div>
+                    
+                    <button type="submit" class="Login-button" id="signInBtn">Sign In</button>
+                    
+                    <div style="text-align: center; margin-top: 20px;">
+                        <a href="#" id="backBtn" style="color: #fff; text-decoration: none; font-size: 14px; opacity: 0.8; transition: opacity 0.3s;"><i class="fa-solid fa-arrow-left"></i> Not you? Change ID</a>
+                    </div>
                 </div>
-                
-                <button type="submit" class="Login-button">Sign In</button>
             </form>
         </div>
 
@@ -89,8 +98,12 @@
         const loginForm = document.getElementById('loginForm');
         const studentIdInput = document.getElementById('studentId');
         const errorMessage = document.getElementById('errorMessage');
-        const loginBtn = document.querySelector('.Login-button');
+        const signInBtn = document.getElementById('signInBtn');
+        const nextBtn = document.getElementById('nextBtn');
         const studentNameDisplay = document.getElementById('studentNameDisplay');
+        const step1Container = document.getElementById('step1Container');
+        const step2Container = document.getElementById('step2Container');
+        const backBtn = document.getElementById('backBtn');
 
         // Debounce utility function
         function debounce(func, delay) {
@@ -109,8 +122,8 @@
             studentNameDisplay.style.display = 'block';
             studentNameDisplay.style.color = '#555';
             studentNameDisplay.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying...';
-            loginBtn.textContent = 'Verifying...';
-            loginBtn.disabled = true;
+            signInBtn.textContent = 'Verifying...';
+            signInBtn.disabled = true;
 
             try {
                 const response = await fetch(url, {
@@ -160,33 +173,38 @@
                         window.location.href = 'studentportal.html';
                     }
                 } else {
-                    studentNameDisplay.style.display = 'none';
-                    errorMessage.textContent = result.message || 'Incorrect Password or Student ID';
+                    studentNameDisplay.style.display = 'block';
+                    studentNameDisplay.style.color = '#10af33';
+                    studentNameDisplay.innerHTML = '<i class="fa-solid fa-check-circle"></i> Welcome, ' + result.name + '!'; 
+                    errorMessage.textContent = result.message || 'Incorrect Password';
                     errorMessage.style.display = 'block';
-                    loginBtn.textContent = 'Sign In';
-                    loginBtn.disabled = false;
+                    signInBtn.textContent = 'Sign In';
+                    signInBtn.disabled = false;
                 }
             } catch (error) {
-                studentNameDisplay.style.display = 'none';
                 console.error('Error:', error);
                 errorMessage.textContent = 'Network Error. Please check your connection.';
                 errorMessage.style.display = 'block';
-                loginBtn.textContent = 'Sign In';
-                loginBtn.disabled = false;
+                signInBtn.textContent = 'Sign In';
+                signInBtn.disabled = false;
             }
         }
 
-        // Auto-verify Student ID
-        studentIdInput.addEventListener('input', debounce(async function() {
+        // Handle ID Verification
+        async function verifyStudentId() {
             const studentId = studentIdInput.value.trim();
             if (studentId === '') {
-                studentNameDisplay.style.display = 'none';
+                errorMessage.textContent = 'Please enter your Student ID.';
+                errorMessage.style.display = 'block';
                 return;
             }
 
+            errorMessage.style.display = 'none';
             studentNameDisplay.style.display = 'block';
             studentNameDisplay.style.color = '#555';
             studentNameDisplay.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Checking ID...';
+            nextBtn.disabled = true;
+            nextBtn.textContent = 'Checking...';
 
             try {
                 const response = await fetch(url, {
@@ -201,16 +219,52 @@
                 if (result.status === 'success' && result.name) {
                     studentNameDisplay.style.color = '#10af33';
                     studentNameDisplay.innerHTML = '<i class="fa-solid fa-check-circle"></i> Welcome, ' + result.name + '!';
+                    
+                    // Proceed to Step 2
+                    step1Container.style.display = 'none';
+                    step2Container.style.display = 'block';
+                    step2Container.classList.add('fade-in-up');
+                    passwordInput.focus();
+
                 } else {
-                    studentNameDisplay.style.color = '#e63946';
-                    studentNameDisplay.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> ID not found';
+                    studentNameDisplay.style.display = 'none';
+                    errorMessage.textContent = 'Student ID not found.';
+                    errorMessage.style.display = 'block';
+                    nextBtn.disabled = false;
+                    nextBtn.textContent = 'Next';
                 }
             } catch (error) {
                 console.error("verifyId error:", error);
-                studentNameDisplay.style.color = '#e63946';
-                studentNameDisplay.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Network error';
+                studentNameDisplay.style.display = 'none';
+                errorMessage.textContent = 'Network error verifying ID.';
+                errorMessage.style.display = 'block';
+                nextBtn.disabled = false;
+                nextBtn.textContent = 'Next';
             }
-        }, 600));
+        }
+
+        // Auto-verify Student ID
+        studentIdInput.addEventListener('input', debounce(function() {
+            if (studentIdInput.value.trim().length >= 4) {
+                verifyStudentId();
+            }
+        }, 800));
+
+        // Manual Next Button Click
+        nextBtn.addEventListener('click', verifyStudentId);
+
+        // Back Button Click
+        backBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            step2Container.style.display = 'none';
+            step1Container.style.display = 'block';
+            studentNameDisplay.style.display = 'none';
+            errorMessage.style.display = 'none';
+            passwordInput.value = '';
+            nextBtn.disabled = false;
+            nextBtn.textContent = 'Next';
+            studentIdInput.focus();
+        });
 
         // Auto-verify when typing password
         passwordInput.addEventListener('input', debounce(function() {
@@ -222,14 +276,19 @@
             }
         }, 800)); // wait 0.8 seconds after they stop typing
 
-        // Manual submit (if they click button or press enter before auto-verify)
+        // Manual submit
         loginForm.addEventListener('submit', function(event) {
             event.preventDefault(); 
             const studentId = studentIdInput.value.trim();
             const password = passwordInput.value.trim();
 
+            if (step2Container.style.display === 'none') {
+                verifyStudentId();
+                return;
+            }
+
             if (studentId === '' || password === '') {
-                errorMessage.textContent = 'Please fill out all fields.';
+                errorMessage.textContent = 'Please enter your password.';
                 errorMessage.style.display = 'block';
                 return;
             }
@@ -239,11 +298,15 @@
         // Reset button state if returning via browser "Back" button
         window.addEventListener('pageshow', function (event) {
             if (event.persisted) {
-                loginBtn.textContent = 'Sign In';
-                loginBtn.disabled = false;
+                signInBtn.textContent = 'Sign In';
+                signInBtn.disabled = false;
                 passwordInput.value = ''; 
+                step2Container.style.display = 'none';
+                step1Container.style.display = 'block';
                 studentNameDisplay.style.display = 'none';
                 errorMessage.style.display = 'none';
+                nextBtn.disabled = false;
+                nextBtn.textContent = 'Next';
             }
         });
 
