@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { LogOut, GraduationCap, IdCard, CalendarDays, Bell, FileText, Download } from 'lucide-react';
+import { LogOut, GraduationCap, IdCard, CalendarDays, Bell, FileText, Download, Loader2 } from 'lucide-react';
 import Swal from 'sweetalert2';
 
 export default function StudentDashboard() {
