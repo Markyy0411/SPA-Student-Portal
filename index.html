@@ -38,6 +38,8 @@
                     <input type="text" id="studentId" placeholder="Student ID" required>
                 </div>
                 
+                <div id="studentNameDisplay" style="color: #10af33; font-weight: 600; text-align: center; margin-bottom: 15px; display: none; font-size: 15px;"></div>
+
                 <div class="input-group">
                     <i class="fa-solid fa-lock"></i>
                     <input type="password" id="password" placeholder="Password" required>
@@ -78,27 +80,80 @@
         const passwordInput = document.getElementById('password');
 
         togglePassword.addEventListener('click', function () {
-            // Toggle the type attribute
             const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordInput.setAttribute('type', type);
-            // Toggle the eye / eye-slash icon
             this.classList.toggle('fa-eye');
             this.classList.toggle('fa-eye-slash');
         });
 
-        // Form Validation
+        const url = 'https://script.google.com/macros/s/AKfycbz6cR-xROnKZME0Fu3CSxiyhYlt4gJgcxxx-Wu_DR9sT2d8H4mrPTtU4XM5GWXFjzfe/exec';
         const loginForm = document.getElementById('loginForm');
         const studentIdInput = document.getElementById('studentId');
         const errorMessage = document.getElementById('errorMessage');
-
         const loginBtn = document.querySelector('.Login-button');
+        const studentNameDisplay = document.getElementById('studentNameDisplay');
+
+        // Debounce utility function
+        function debounce(func, delay) {
+            let timeoutId;
+            return function (...args) {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    func.apply(this, args);
+                }, delay);
+            };
+        }
+
+        // Auto-verify Student ID
+        studentIdInput.addEventListener('input', debounce(async function() {
+            const studentId = studentIdInput.value.trim();
+            if (studentId === '') {
+                studentNameDisplay.style.display = 'none';
+                return;
+            }
+
+            studentNameDisplay.style.display = 'block';
+            studentNameDisplay.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Checking ID...';
+            studentNameDisplay.style.color = '#555';
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'verifyId',
+                        student_id: studentId
+                    })
+                });
+                const result = await response.json();
+                
+                if (result.status === 'success' && result.name) {
+                    studentNameDisplay.style.color = '#10af33';
+                    studentNameDisplay.innerHTML = '<i class="fa-solid fa-check-circle"></i> Welcome, ' + result.name + '!';
+                } else {
+                    studentNameDisplay.style.color = '#e63946';
+                    studentNameDisplay.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> ID not found';
+                }
+            } catch (error) {
+                studentNameDisplay.style.display = 'none';
+            }
+        }, 800));
+
+        // Auto-verify Password
+        passwordInput.addEventListener('input', debounce(function() {
+            const studentId = studentIdInput.value.trim();
+            const password = passwordInput.value.trim();
+            if (studentId !== '' && password !== '') {
+                // Automatically click the Sign In button to trigger login
+                loginBtn.click();
+            }
+        }, 1000));
 
         // Reset button state if returning via browser "Back" button
         window.addEventListener('pageshow', function (event) {
             if (event.persisted) {
                 loginBtn.textContent = 'Sign In';
                 loginBtn.disabled = false;
-                passwordInput.value = ''; // Clear password for security
+                passwordInput.value = ''; 
             }
         });
 
