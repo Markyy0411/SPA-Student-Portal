@@ -217,7 +217,7 @@ export default function LoginPage() {
 
         {/* About Section Overlay */}
         {showAbout && (
-          <div className="absolute inset-0 bg-white/95 backdrop-blur-md rounded-2xl p-8 shadow-2xl border border-white/20 animate-fade-in z-10 flex flex-col justify-center text-center">
+          <div className="absolute inset-0 bg-white/95 backdrop-blur-md rounded-2xl p-8 shadow-2xl border border-white/20 animate-fade-in z-10 flex flex-col justify-center overflow-y-auto">
             <button 
               type="button"
               className="absolute top-4 left-4 text-gray-500 hover:text-green-600 transition-colors flex items-center text-sm font-medium"
@@ -225,15 +225,26 @@ export default function LoginPage() {
             >
               <ArrowLeft size={16} className="mr-1" /> Back
             </button>
-            <h2 className="text-2xl font-bold text-green-700 mb-4">About the System</h2>
-            <p className="text-gray-600 mb-6 text-sm leading-relaxed">
-              This Student Portal is a secure platform designed for Saint Patrick's Academy students, staff, and administrators to access important records, announcements, and schedules. 
-              <br/><br/>
-              Created with ❤️ by SPA IT Department.
-            </p>
+            <h2 className="text-2xl font-bold text-green-700 mb-6 text-center">Saint Patrick's Academy</h2>
+            
+            <div className="text-gray-700 text-sm space-y-4 mb-6">
+              <p><strong>Location:</strong> Dingalan, Aurora</p>
+              <p><strong>Founded:</strong> 1968</p>
+              
+              <div className="border-t border-gray-200 pt-4">
+                <h3 className="font-bold text-green-700 mb-1">Vision</h3>
+                <p className="leading-relaxed">To provide holistic formation for students inspired by the Blessed Trinity and in communion with the family, church, and community.</p>
+              </div>
+              
+              <div className="border-t border-gray-200 pt-4">
+                <h3 className="font-bold text-green-700 mb-1">Mission</h3>
+                <p className="leading-relaxed">Following Jesus Christ through living the Carmelian spirit of prayer, compassion, and prophetic action to provide quality education for the church and society.</p>
+              </div>
+            </div>
+            
             <button
               onClick={() => setShowAbout(false)}
-              className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors w-max mx-auto shadow-md"
+              className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors w-max mx-auto shadow-md mt-auto"
             >
               Close
             </button>
