@@ -1,6 +1,8 @@
+"use client";
+
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { LogOut, GraduationCap, IdCard, CalendarDays, Bell, FileText, Download, ArrowLeft, UserCircle, User } from 'lucide-react';
+import { LogOut, GraduationCap, IdCard, CalendarDays, Bell, FileText, Download } from 'lucide-react';
 import Swal from 'sweetalert2';
 import { supabase } from '@/utils/supabase';
 
@@ -56,134 +58,123 @@ export default function StudentDashboard() {
       title: 'Download Started!',
       text: `In a fully built system, ${filename} would download now.`,
       icon: 'info',
-      confirmButtonColor: '#008751'
+      confirmButtonColor: '#16a34a'
     });
   };
 
   if (!currentUser) return null;
 
-  const formatDate = (dateStr: string) => {
-    if (!dateStr) return 'N/A';
-    const date = new Date(dateStr);
-    return isNaN(date.getTime()) ? dateStr : date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-  };
-
   return (
-    <div className="min-h-screen font-sans relative overflow-x-hidden">
-      {/* Fixed Background Image */}
-      <div 
-        className="fixed inset-0 bg-[url('/bg.jpg')] bg-cover bg-center bg-no-repeat -z-10"
-      ></div>
+    <div 
+      className="min-h-screen bg-cover bg-center bg-fixed"
+      style={{ backgroundImage: "url('/bg.jpg')" }}
+    >
+      <div className="min-h-screen bg-black/40 backdrop-blur-sm p-4 sm:p-8">
+        <div className="max-w-5xl mx-auto bg-white/95 backdrop-blur-md rounded-2xl p-6 sm:p-10 shadow-2xl">
+          
+          {/* Header */}
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="text-2xl sm:text-3xl font-bold text-green-700 flex items-center">
+              <GraduationCap className="mr-3" size={32} />
+              Student Dashboard
+            </h1>
+            <button 
+              onClick={handleLogout}
+              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center"
+            >
+              <LogOut size={18} className="mr-2 hidden sm:block" />
+              Logout
+            </button>
+          </div>
 
-      <div className="max-w-[1000px] mx-auto mt-20 mb-20 px-5">
-        <div className="bg-white/90 backdrop-blur-[15px] rounded-[20px] p-10 shadow-[0_8px_32px_rgba(0,0,0,0.2)] min-h-[500px]">
-          
-          <button 
-            onClick={handleLogout}
-            className="float-right bg-[#ff4d4d] hover:bg-[#e60000] text-white border-none py-2.5 px-5 rounded-lg cursor-pointer font-semibold transition-colors"
-          >
-            Logout
-          </button>
-          
-          {/* Main Dashboard */}
+          {/* Tab Content */}
           {activeTab === 'dashboard' && (
-            <div className="animate-fade-in">
-              <h1 className="text-[#008751] text-3xl font-bold mb-2.5 flex items-center gap-3">
-                <GraduationCap size={32} /> Student Dashboard
-              </h1>
-              <p className="text-gray-800 text-[16px] mb-8">
-                Welcome back, <span className="font-semibold">{currentUser.name || 'Student'}</span>! Check your progress and latest updates here.
+            <div className="animate-fade-in-up">
+              <p className="text-gray-600 mb-8 text-lg">
+                Welcome back, <span className="font-semibold text-gray-900">{currentUser.name || 'Student'}</span>! Check your progress and latest updates here.
               </p>
-              
-              <div className="flex flex-wrap gap-5 mt-[30px]">
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div 
                   onClick={() => setActiveTab('profile')}
-                  className="flex-[1_1_250px] bg-white p-[25px] rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.05)] text-center border-t-4 border-[#008751] transition-transform duration-300 hover:-translate-y-1.5 cursor-pointer"
+                  className="bg-white p-6 rounded-xl shadow-md border-t-4 border-green-600 cursor-pointer hover:-translate-y-1 transition-transform group text-center"
                 >
-                  <IdCard size={35} className="text-[#008751] mx-auto mb-4" />
-                  <h3 className="text-[19px] font-semibold mb-2">My Profile & Balance</h3>
-                  <p className="text-[14px] text-gray-600">View your personal information and current outstanding balance.</p>
+                  <IdCard size={40} className="text-green-600 mx-auto mb-4 group-hover:scale-110 transition-transform" />
+                  <h3 className="font-bold text-gray-800 mb-2">My Profile & Balance</h3>
+                  <p className="text-sm text-gray-500">View your personal info and outstanding balance.</p>
                 </div>
                 
                 <div 
                   onClick={() => setActiveTab('schedule')}
-                  className="flex-[1_1_250px] bg-white p-[25px] rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.05)] text-center border-t-4 border-[#008751] transition-transform duration-300 hover:-translate-y-1.5 cursor-pointer"
+                  className="bg-white p-6 rounded-xl shadow-md border-t-4 border-green-600 cursor-pointer hover:-translate-y-1 transition-transform group text-center"
                 >
-                  <CalendarDays size={35} className="text-[#008751] mx-auto mb-4" />
-                  <h3 className="text-[19px] font-semibold mb-2">Class Schedule</h3>
-                  <p className="text-[14px] text-gray-600">View your weekly class schedule and room assignments.</p>
+                  <CalendarDays size={40} className="text-green-600 mx-auto mb-4 group-hover:scale-110 transition-transform" />
+                  <h3 className="font-bold text-gray-800 mb-2">Class Schedule</h3>
+                  <p className="text-sm text-gray-500">View your weekly class schedule and rooms.</p>
                 </div>
                 
                 <div 
                   onClick={loadAnnouncements}
-                  className="flex-[1_1_250px] bg-white p-[25px] rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.05)] text-center border-t-4 border-[#008751] transition-transform duration-300 hover:-translate-y-1.5 cursor-pointer"
+                  className="bg-white p-6 rounded-xl shadow-md border-t-4 border-green-600 cursor-pointer hover:-translate-y-1 transition-transform group text-center"
                 >
-                  <Bell size={35} className="text-[#008751] mx-auto mb-4" />
-                  <h3 className="text-[19px] font-semibold mb-2">Announcements</h3>
-                  <p className="text-[14px] text-gray-600">Read the latest news and updates from the school.</p>
+                  <Bell size={40} className="text-green-600 mx-auto mb-4 group-hover:scale-110 transition-transform" />
+                  <h3 className="font-bold text-gray-800 mb-2">Announcements</h3>
+                  <p className="text-sm text-gray-500">Read the latest news and updates.</p>
                 </div>
                 
                 <div 
                   onClick={() => setActiveTab('documents')}
-                  className="flex-[1_1_250px] bg-white p-[25px] rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.05)] text-center border-t-4 border-[#008751] transition-transform duration-300 hover:-translate-y-1.5 cursor-pointer"
+                  className="bg-white p-6 rounded-xl shadow-md border-t-4 border-green-600 cursor-pointer hover:-translate-y-1 transition-transform group text-center"
                 >
-                  <FileText size={35} className="text-[#008751] mx-auto mb-4" />
-                  <h3 className="text-[19px] font-semibold mb-2">Download Documents</h3>
-                  <p className="text-[14px] text-gray-600">Access enrollment forms, student handbook, and waivers.</p>
+                  <FileText size={40} className="text-green-600 mx-auto mb-4 group-hover:scale-110 transition-transform" />
+                  <h3 className="font-bold text-gray-800 mb-2">Documents</h3>
+                  <p className="text-sm text-gray-500">Download handbook and waivers.</p>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Profile View */}
           {activeTab === 'profile' && (
-            <div className="animate-fade-in">
+            <div className="animate-fade-in-up">
               <button 
                 onClick={() => setActiveTab('dashboard')}
-                className="bg-[#555] hover:bg-[#333] text-white border-none py-2.5 px-5 rounded-lg cursor-pointer font-semibold transition-colors flex items-center gap-2 mb-5"
+                className="text-gray-500 hover:text-gray-800 mb-6 font-medium inline-flex items-center transition-colors"
               >
-                <ArrowLeft size={16} /> Back to Dashboard
+                &larr; Back to Dashboard
               </button>
               
-              <h2 className="text-[#008751] text-2xl font-bold mb-5 flex items-center gap-3">
-                <User size={26} /> My Profile & Balance
+              <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                <IdCard className="mr-3 text-green-600" /> My Profile & Balance
               </h2>
-              
-              <div className="bg-white p-[30px] rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.05)] max-w-[600px] mt-5 border-l-[5px] border-[#008751]">
-                <div className="flex justify-between py-3 border-b border-[#eee] text-[16px]">
-                  <span className="text-[#666] font-medium">Student Name:</span>
-                  <span className="font-semibold text-[#333] text-right">{currentUser.name || 'Not set'}</span>
+
+              <div className="bg-white rounded-xl shadow-sm border border-gray-100 max-w-2xl border-l-4 border-l-green-600 p-6 divide-y divide-gray-100">
+                <div className="flex justify-between py-4">
+                  <span className="text-gray-500 font-medium">Student Name:</span>
+                  <span className="font-bold text-gray-900">{currentUser.name || 'Not set'}</span>
                 </div>
-                <div className="flex justify-between py-3 border-b border-[#eee] text-[16px]">
-                  <span className="text-[#666] font-medium">LRN:</span>
-                  <span className="font-semibold text-[#333] text-right">{currentUser.lrn || 'N/A'}</span>
+                <div className="flex justify-between py-4">
+                  <span className="text-gray-500 font-medium">LRN:</span>
+                  <span className="font-semibold text-gray-900">{currentUser.lrn || 'N/A'}</span>
                 </div>
-                <div className="flex justify-between py-3 border-b border-[#eee] text-[16px]">
-                  <span className="text-[#666] font-medium">Student ID:</span>
-                  <span className="font-semibold text-[#333] text-right">{currentUser.student_id || 'N/A'}</span>
+                <div className="flex justify-between py-4">
+                  <span className="text-gray-500 font-medium">Student ID:</span>
+                  <span className="font-semibold text-gray-900">{currentUser.student_id || 'N/A'}</span>
                 </div>
-                <div className="flex justify-between py-3 border-b border-[#eee] text-[16px]">
-                  <span className="text-[#666] font-medium">Date of Birth:</span>
-                  <span className="font-semibold text-[#333] text-right">{formatDate(currentUser.dob)}</span>
+                <div className="flex justify-between py-4">
+                  <span className="text-gray-500 font-medium">Date of Birth:</span>
+                  <span className="font-semibold text-gray-900">
+                    {currentUser.dob ? (
+                      isNaN(new Date(currentUser.dob).getTime()) ? currentUser.dob : new Date(currentUser.dob).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+                    ) : 'N/A'}
+                  </span>
                 </div>
-                <div className="flex justify-between py-3 border-b border-[#eee] text-[16px]">
-                  <span className="text-[#666] font-medium">Age / Sex:</span>
-                  <span className="font-semibold text-[#333] text-right">{currentUser.age || '0'} / {currentUser.sex || '-'}</span>
+                <div className="flex justify-between py-4">
+                  <span className="text-gray-500 font-medium">Current Balance:</span>
+                  <span className="font-bold text-green-600 text-xl">₱{currentUser.balance || '0'}</span>
                 </div>
-                <div className="flex justify-between py-3 border-b border-[#eee] text-[16px]">
-                  <span className="text-[#666] font-medium">Guardian Contact:</span>
-                  <span className="font-semibold text-[#333] text-right">{currentUser.contact || 'N/A'}</span>
-                </div>
-                <div className="flex justify-between py-3 border-b border-[#eee] text-[16px]">
-                  <span className="text-[#666] font-medium">Current Balance:</span>
-                  <span className="font-bold text-[#008751] text-[22px] text-right">₱{currentUser.balance || '0'}</span>
-                </div>
-                <div className="flex justify-between py-3 text-[16px]">
-                  <span className="text-[#666] font-medium">Enrollment Status:</span>
-                  <span 
-                    className="font-semibold text-right capitalize"
-                    style={{ color: currentUser.status_val === 'Paid' ? '#008751' : currentUser.status_val === 'Unpaid' ? '#ff4d4d' : '#e6a23c' }}
-                  >
+                <div className="flex justify-between py-4">
+                  <span className="text-gray-500 font-medium">Enrollment Status:</span>
+                  <span className={`font-bold uppercase ${currentUser.status_val === 'Paid' ? 'text-green-600' : currentUser.status_val === 'Unpaid' ? 'text-red-500' : 'text-yellow-600'}`}>
                     {currentUser.status_val || 'Pending'}
                   </span>
                 </div>
@@ -191,61 +182,59 @@ export default function StudentDashboard() {
             </div>
           )}
 
-          {/* Schedule View */}
           {activeTab === 'schedule' && (
-            <div className="animate-fade-in">
+            <div className="animate-fade-in-up">
               <button 
                 onClick={() => setActiveTab('dashboard')}
-                className="bg-[#555] hover:bg-[#333] text-white border-none py-2.5 px-5 rounded-lg cursor-pointer font-semibold transition-colors flex items-center gap-2 mb-5"
+                className="text-gray-500 hover:text-gray-800 mb-6 font-medium inline-flex items-center transition-colors"
               >
-                <ArrowLeft size={16} /> Back to Dashboard
+                &larr; Back to Dashboard
               </button>
               
-              <h2 className="text-[#008751] text-2xl font-bold mb-2 flex items-center gap-3">
-                <CalendarDays size={26} /> Weekly Schedule
+              <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                <CalendarDays className="mr-3 text-green-600" /> Weekly Schedule
               </h2>
-              <p className="text-gray-800 mb-5">Your current class schedule for the semester.</p>
-              
-              <div className="overflow-x-auto mt-5">
-                <table className="w-full border-collapse bg-white rounded-lg overflow-hidden shadow-[0_4px_10px_rgba(0,0,0,0.05)] text-center">
-                  <thead>
+
+              <div className="overflow-x-auto bg-white rounded-xl shadow-sm border border-gray-100">
+                <table className="w-full text-center">
+                  <thead className="bg-green-600 text-white">
                     <tr>
-                      <th className="bg-[#008751] text-white font-semibold p-[15px] border-r border-[#eee]">Time</th>
-                      <th className="bg-[#008751] text-white font-semibold p-[15px] border-r border-[#eee]">Monday</th>
-                      <th className="bg-[#008751] text-white font-semibold p-[15px] border-r border-[#eee]">Tuesday</th>
-                      <th className="bg-[#008751] text-white font-semibold p-[15px] border-r border-[#eee]">Wednesday</th>
-                      <th className="bg-[#008751] text-white font-semibold p-[15px] border-r border-[#eee]">Thursday</th>
-                      <th className="bg-[#008751] text-white font-semibold p-[15px]">Friday</th>
+                      <th className="p-4 font-semibold border-b border-green-700">Time</th>
+                      <th className="p-4 font-semibold border-b border-green-700">Monday</th>
+                      <th className="p-4 font-semibold border-b border-green-700">Tuesday</th>
+                      <th className="p-4 font-semibold border-b border-green-700">Wednesday</th>
+                      <th className="p-4 font-semibold border-b border-green-700">Thursday</th>
+                      <th className="p-4 font-semibold border-b border-green-700">Friday</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody className="divide-y divide-gray-100">
                     <tr>
-                      <td className="font-semibold bg-[#f9f9f9] text-[#555] p-[15px] border-b border-r border-[#eee]">08:00 AM - 09:30 AM</td>
-                      <td className="bg-[#e8f5e9] text-[#1b5e20] font-semibold p-[15px] border-b border-r border-[#eee]">Mathematics<br/><small className="font-normal">Room 101</small></td>
-                      <td className="bg-[#e8f5e9] text-[#1b5e20] font-semibold p-[15px] border-b border-r border-[#eee]">Science<br/><small className="font-normal">Lab A</small></td>
-                      <td className="bg-[#e8f5e9] text-[#1b5e20] font-semibold p-[15px] border-b border-r border-[#eee]">Mathematics<br/><small className="font-normal">Room 101</small></td>
-                      <td className="bg-[#e8f5e9] text-[#1b5e20] font-semibold p-[15px] border-b border-r border-[#eee]">Science<br/><small className="font-normal">Lab A</small></td>
-                      <td className="bg-[#e8f5e9] text-[#1b5e20] font-semibold p-[15px] border-b border-[#eee]">Physical Ed.<br/><small className="font-normal">Gym</small></td>
+                      <td className="p-4 font-semibold text-gray-500 bg-gray-50">08:00 AM - 09:30 AM</td>
+                      <td className="p-4 bg-green-50 text-green-800 font-bold rounded-lg m-1">Mathematics<br/><span className="font-normal text-sm">Room 101</span></td>
+                      <td className="p-4 bg-green-50 text-green-800 font-bold rounded-lg m-1">Science<br/><span className="font-normal text-sm">Lab A</span></td>
+                      <td className="p-4 bg-green-50 text-green-800 font-bold rounded-lg m-1">Mathematics<br/><span className="font-normal text-sm">Room 101</span></td>
+                      <td className="p-4 bg-green-50 text-green-800 font-bold rounded-lg m-1">Science<br/><span className="font-normal text-sm">Lab A</span></td>
+                      <td className="p-4 bg-green-50 text-green-800 font-bold rounded-lg m-1">Physical Ed.<br/><span className="font-normal text-sm">Gym</span></td>
                     </tr>
                     <tr>
-                      <td className="font-semibold bg-[#f9f9f9] text-[#555] p-[15px] border-b border-r border-[#eee]">09:30 AM - 11:00 AM</td>
-                      <td className="bg-[#e8f5e9] text-[#1b5e20] font-semibold p-[15px] border-b border-r border-[#eee]">English<br/><small className="font-normal">Room 102</small></td>
-                      <td className="bg-[#e8f5e9] text-[#1b5e20] font-semibold p-[15px] border-b border-r border-[#eee]">History<br/><small className="font-normal">Room 205</small></td>
-                      <td className="bg-[#e8f5e9] text-[#1b5e20] font-semibold p-[15px] border-b border-r border-[#eee]">English<br/><small className="font-normal">Room 102</small></td>
-                      <td className="bg-[#e8f5e9] text-[#1b5e20] font-semibold p-[15px] border-b border-r border-[#eee]">History<br/><small className="font-normal">Room 205</small></td>
-                      <td className="bg-[#e8f5e9] text-[#1b5e20] font-semibold p-[15px] border-b border-[#eee]">Computer<br/><small className="font-normal">Lab B</small></td>
+                      <td className="p-4 font-semibold text-gray-500 bg-gray-50">09:30 AM - 11:00 AM</td>
+                      <td className="p-4 bg-green-50 text-green-800 font-bold rounded-lg m-1">English<br/><span className="font-normal text-sm">Room 102</span></td>
+                      <td className="p-4 bg-green-50 text-green-800 font-bold rounded-lg m-1">History<br/><span className="font-normal text-sm">Room 205</span></td>
+                      <td className="p-4 bg-green-50 text-green-800 font-bold rounded-lg m-1">English<br/><span className="font-normal text-sm">Room 102</span></td>
+                      <td className="p-4 bg-green-50 text-green-800 font-bold rounded-lg m-1">History<br/><span className="font-normal text-sm">Room 205</span></td>
+                      <td className="p-4 bg-green-50 text-green-800 font-bold rounded-lg m-1">Computer<br/><span className="font-normal text-sm">Lab B</span></td>
                     </tr>
                     <tr>
-                      <td className="font-semibold bg-[#f9f9f9] text-[#555] p-[15px] border-b border-r border-[#eee]">11:00 AM - 12:00 PM</td>
-                      <td colSpan={5} className="bg-[#fff3e0] text-[#e65100] font-semibold p-[15px] border-b border-[#eee]">LUNCH BREAK</td>
+                      <td className="p-4 font-semibold text-gray-500 bg-gray-50">11:00 AM - 12:00 PM</td>
+                      <td colSpan={5} className="p-4 bg-orange-50 text-orange-600 font-bold uppercase tracking-wider">LUNCH BREAK</td>
                     </tr>
                     <tr>
-                      <td className="font-semibold bg-[#f9f9f9] text-[#555] p-[15px] border-r border-[#eee]">12:00 PM - 01:30 PM</td>
-                      <td className="bg-[#e8f5e9] text-[#1b5e20] font-semibold p-[15px] border-r border-[#eee]">Values Ed.<br/><small className="font-normal">Room 105</small></td>
-                      <td className="p-[15px] border-r border-[#eee]">-</td>
-                      <td className="bg-[#e8f5e9] text-[#1b5e20] font-semibold p-[15px] border-r border-[#eee]">Values Ed.<br/><small className="font-normal">Room 105</small></td>
-                      <td className="p-[15px] border-r border-[#eee]">-</td>
-                      <td className="bg-[#e8f5e9] text-[#1b5e20] font-semibold p-[15px]">Arts & Music<br/><small className="font-normal">Room 106</small></td>
+                      <td className="p-4 font-semibold text-gray-500 bg-gray-50">12:00 PM - 01:30 PM</td>
+                      <td className="p-4 bg-green-50 text-green-800 font-bold rounded-lg m-1">Values Ed.<br/><span className="font-normal text-sm">Room 105</span></td>
+                      <td className="p-4 text-gray-400">-</td>
+                      <td className="p-4 bg-green-50 text-green-800 font-bold rounded-lg m-1">Values Ed.<br/><span className="font-normal text-sm">Room 105</span></td>
+                      <td className="p-4 text-gray-400">-</td>
+                      <td className="p-4 bg-green-50 text-green-800 font-bold rounded-lg m-1">Arts & Music<br/><span className="font-normal text-sm">Room 106</span></td>
                     </tr>
                   </tbody>
                 </table>
@@ -253,67 +242,52 @@ export default function StudentDashboard() {
             </div>
           )}
 
-          {/* Announcements View */}
           {activeTab === 'announcements' && (
-            <div className="animate-fade-in">
+            <div className="animate-fade-in-up">
               <button 
                 onClick={() => setActiveTab('dashboard')}
-                className="bg-[#555] hover:bg-[#333] text-white border-none py-2.5 px-5 rounded-lg cursor-pointer font-semibold transition-colors flex items-center gap-2 mb-5"
+                className="text-gray-500 hover:text-gray-800 mb-6 font-medium inline-flex items-center transition-colors"
               >
-                <ArrowLeft size={16} /> Back to Dashboard
+                &larr; Back to Dashboard
               </button>
               
-              <h2 className="text-[#008751] text-2xl font-bold mb-2 flex items-center gap-3">
-                <Bell size={26} /> Latest Announcements
+              <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                <Bell className="mr-3 text-green-600" /> Latest Announcements
               </h2>
-              <p className="text-gray-800 mb-5">Stay up to date with the latest news from your teachers and administrators.</p>
-              
+
               {loadingAnnouncements ? (
-                <p className="italic text-[#666]">Checking for new announcements...</p>
+                <p className="text-gray-500 animate-pulse">Checking for new announcements...</p>
+              ) : announcements.length === 0 ? (
+                <p className="text-gray-500">No announcements at this time.</p>
               ) : (
-                <div className="flex flex-col gap-[15px] mt-5">
-                  {announcements.length === 0 ? (
-                    <p>No announcements at this time.</p>
-                  ) : (
-                    announcements.map((ann, i) => {
-                      let dateStr = ann.date;
-                      try {
-                        const d = new Date(ann.date);
-                        if (!isNaN(d.getTime())) {
-                          dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-                        }
-                      } catch(e) {}
-                      return (
-                        <div key={i} className="bg-white p-5 rounded-xl border-l-[5px] border-[#10af33] shadow-[0_4px_10px_rgba(0,0,0,0.05)]">
-                          <div className="text-[13px] text-[#777] mb-2.5 font-medium">
-                            <UserCircle size={14} className="inline mr-1 -mt-0.5" /> Posted by <strong>{ann.author || 'Admin'}</strong> on {dateStr}
-                          </div>
-                          <div className="text-[16px] leading-[1.5] text-[#333] whitespace-pre-wrap">{ann.message}</div>
-                        </div>
-                      )
-                    })
-                  )}
+                <div className="space-y-4">
+                  {announcements.map((ann, i) => (
+                    <div key={i} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 border-l-4 border-l-green-500">
+                      <div className="text-sm text-gray-500 mb-3 font-medium">
+                        Posted by <span className="font-bold text-gray-800">{ann.author || 'Admin'}</span> • {new Date(ann.date).toLocaleDateString()}
+                      </div>
+                      <div className="text-gray-800 leading-relaxed whitespace-pre-wrap">{ann.message}</div>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
           )}
 
-          {/* Documents View */}
           {activeTab === 'documents' && (
-            <div className="animate-fade-in">
+            <div className="animate-fade-in-up">
               <button 
                 onClick={() => setActiveTab('dashboard')}
-                className="bg-[#555] hover:bg-[#333] text-white border-none py-2.5 px-5 rounded-lg cursor-pointer font-semibold transition-colors flex items-center gap-2 mb-5"
+                className="text-gray-500 hover:text-gray-800 mb-6 font-medium inline-flex items-center transition-colors"
               >
-                <ArrowLeft size={16} /> Back to Dashboard
+                &larr; Back to Dashboard
               </button>
               
-              <h2 className="text-[#008751] text-2xl font-bold mb-2 flex items-center gap-3">
-                <FileText size={26} /> Download Documents
+              <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                <FileText className="mr-3 text-green-600" /> Download Documents
               </h2>
-              <p className="text-gray-800 mb-5">Click on any document below to download it directly to your device.</p>
-              
-              <div className="flex flex-col gap-[15px] mt-5">
+
+              <div className="space-y-4">
                 {[
                   { title: 'Student Handbook 2025-2026', size: '2.4 MB' },
                   { title: 'Medical Waiver & Consent Form', size: '150 KB' },
@@ -322,14 +296,16 @@ export default function StudentDashboard() {
                   <div 
                     key={i}
                     onClick={() => handleDownload(doc.title)}
-                    className="bg-white p-5 rounded-xl border-l-[5px] border-[#e63946] shadow-[0_4px_10px_rgba(0,0,0,0.05)] flex items-center gap-5 cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_6px_15px_rgba(0,0,0,0.1)] no-underline block"
+                    className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 border-l-4 border-l-red-500 flex items-center justify-between cursor-pointer hover:shadow-md hover:-translate-y-1 transition-all"
                   >
-                    <FileText size={35} className="text-[#e63946]" />
-                    <div className="flex-1">
-                      <div className="text-[16px] text-[#333] font-semibold">{doc.title}</div>
-                      <div className="text-[13px] text-[#777] font-medium mt-1">PDF Document &bull; {doc.size}</div>
+                    <div className="flex items-center">
+                      <FileText className="text-red-500 mr-4" size={32} />
+                      <div>
+                        <h4 className="font-bold text-gray-800">{doc.title}</h4>
+                        <p className="text-sm text-gray-500 mt-1">PDF Document • {doc.size}</p>
+                      </div>
                     </div>
-                    <Download size={20} className="text-[#777] ml-auto" />
+                    <Download className="text-gray-400" />
                   </div>
                 ))}
               </div>
