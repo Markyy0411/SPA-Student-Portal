@@ -145,8 +145,9 @@
                 
                 if (result.status === 'success') {
                     // Show Name on Screen!
+                    const displayName = result.name || 'User';
                     studentNameDisplay.style.color = '#ffffff';
-                    studentNameDisplay.innerHTML = '<i class="fa-solid fa-check-circle" style="color: #4ade80; margin-right: 5px;"></i> Welcome, ' + result.name + '!';
+                    studentNameDisplay.innerHTML = '<i class="fa-solid fa-check-circle" style="color: #4ade80; margin-right: 5px;"></i> Welcome, ' + displayName + '!';
                     
                     // Save user data to localStorage
                     localStorage.setItem('currentUser', JSON.stringify({
@@ -179,9 +180,10 @@
                         window.location.href = 'studentportal.html';
                     }
                 } else {
+                    const displayName = result.name || 'User';
                     studentNameDisplay.style.display = 'block';
-                    studentNameDisplay.style.color = '#10af33';
-                    studentNameDisplay.innerHTML = '<i class="fa-solid fa-check-circle"></i> Welcome, ' + result.name + '!'; 
+                    studentNameDisplay.style.color = '#ffffff';
+                    studentNameDisplay.innerHTML = '<i class="fa-solid fa-check-circle" style="color: #4ade80; margin-right: 5px;"></i> Welcome, ' + displayName + '!'; 
                     errorMessage.textContent = result.message || 'Incorrect Password';
                     errorMessage.style.display = 'block';
                     signInBtn.textContent = 'Sign In';
@@ -228,9 +230,10 @@
                 });
                 const result = await response.json();
                 
-                if (result.status === 'success' && result.name) {
+                if (result.status === 'success') {
+                    const displayName = result.name || 'User';
                     studentNameDisplay.style.color = '#ffffff';
-                    studentNameDisplay.innerHTML = '<i class="fa-solid fa-check-circle" style="color: #4ade80; margin-right: 5px;"></i> Welcome, ' + result.name + '!';
+                    studentNameDisplay.innerHTML = '<i class="fa-solid fa-check-circle" style="color: #4ade80; margin-right: 5px;"></i> Welcome, ' + displayName + '!';
                     
                     // Proceed to Step 2
                     step1Container.style.display = 'none';
