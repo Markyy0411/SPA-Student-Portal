@@ -150,6 +150,9 @@
             if (isVerifying) return;
             isVerifying = true;
 
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 25000);
+
             errorMessage.style.display = 'none';
             studentNameDisplay.style.display = 'block';
             studentNameDisplay.style.color = '#555';
@@ -160,6 +163,7 @@
             try {
                 const response = await fetch(url, {
                     method: 'POST',
+                    signal: controller.signal,
                     body: JSON.stringify({
                         action: 'login',
                         student_id: studentId,
@@ -167,6 +171,7 @@
                     })
                 });
                 
+                clearTimeout(timeoutId);
                 const result = await response.json();
                 
                 if (result.status === 'success') {
@@ -217,7 +222,11 @@
                 }
             } catch (error) {
                 console.error('Error:', error);
-                errorMessage.textContent = 'Network Error. Please check your connection.';
+                if (error.name === 'AbortError') {
+                    errorMessage.textContent = 'Server is taking too long. Please try again.';
+                } else {
+                    errorMessage.textContent = 'Network Error. Please check your connection.';
+                }
                 errorMessage.style.display = 'block';
                 signInBtn.textContent = 'Sign In';
                 signInBtn.disabled = false;
