@@ -266,7 +266,7 @@ export default function StudentDashboard() {
                     ))}
                   </div>
                 ) : announcements && announcements.length > 0 ? (
-                  announcements.map((ann, idx) => (
+                  announcements.map((ann: any, idx: number) => (
                     <div key={idx} className="bg-white/10 border border-white/20 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
                       <div className="flex justify-between items-start mb-3 border-b border-white/10 pb-3">
                         <span className="font-bold text-green-400 flex items-center">
