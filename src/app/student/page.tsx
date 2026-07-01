@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import useSWR from 'swr';
-import { LogOut, GraduationCap, IdCard, CalendarDays, Bell, FileText, Download, Moon, Sun, ArrowLeft, ReceiptText } from 'lucide-react';
+import { LogOut, GraduationCap, IdCard, CalendarDays, Bell, FileText, Download, Moon, Sun, ArrowLeft, ReceiptText, Megaphone } from 'lucide-react';
 import Swal from 'sweetalert2';
 
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz6cR-xROnKZME0Fu3CSxiyhYlt4gJgcxxx-Wu_DR9sT2d8H4mrPTtU4XM5GWXFjzfe/exec';
