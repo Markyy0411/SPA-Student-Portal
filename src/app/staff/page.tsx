@@ -154,17 +154,15 @@ export default function StaffDashboard() {
 
   if (!currentUser) {
     return (
-      <div className="min-h-screen bg-[#111] flex flex-col items-center justify-center font-sans">
-        <Loader2 className="animate-spin text-white w-12 h-12 mb-4" />
-        <p className="text-gray-300 font-medium">Loading portal...</p>
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center font-sans">
+        <Loader2 className="animate-spin text-blue-600 w-12 h-12 mb-4" />
+        <p className="text-gray-600 font-medium">Loading portal...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen font-sans relative overflow-x-hidden text-gray-100 flex flex-col">
-      <div className="fixed inset-0 bg-[url('/bghome.jpg')] bg-cover bg-center bg-fixed -z-10"></div>
-      <div className="fixed inset-0 bg-black/40 backdrop-blur-[2px] -z-10"></div>
+    <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
       {/* Navbar (The Orange Header) */}
       <nav className="bg-[#ea580c] text-white shadow-lg sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -193,21 +191,21 @@ export default function StaffDashboard() {
         {activeView === 'dashboard' && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 animate-fade-in max-w-4xl">
             
-            <div onClick={() => setActiveView('search')} className="bg-white/10 backdrop-blur-[15px] rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.2)] border border-white/20 text-white p-6 hover:shadow-md transition-shadow border-l-4 border-l-orange-500 cursor-pointer group">
-              <div className="bg-orange-500/20 w-14 h-14 rounded-xl flex items-center justify-center mb-4 text-orange-600">
+            <div onClick={() => setActiveView('search')} className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow border-l-4 border-l-orange-500 cursor-pointer group">
+              <div className="bg-orange-50 w-14 h-14 rounded-xl flex items-center justify-center mb-4 text-orange-600">
                 <CreditCard size={28} />
               </div>
-              <h2 className="text-xl font-bold text-white mb-2">Update Balances</h2>
-              <p className="text-gray-300 text-sm mb-4">Record payments and update student outstanding balances.</p>
+              <h2 className="text-xl font-bold text-gray-900 mb-2">Update Balances</h2>
+              <p className="text-gray-500 text-sm mb-4">Record payments and update student outstanding balances.</p>
               <button className="text-orange-600 font-semibold text-sm group-hover:text-orange-800 transition-colors">Search Student &rarr;</button>
             </div>
 
-            <div onClick={() => setActiveView('announcements')} className="bg-white/10 backdrop-blur-[15px] rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.2)] border border-white/20 text-white p-6 hover:shadow-md transition-shadow border-l-4 border-l-orange-500 cursor-pointer group">
-              <div className="bg-orange-500/20 w-14 h-14 rounded-xl flex items-center justify-center mb-4 text-orange-600">
+            <div onClick={() => setActiveView('announcements')} className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow border-l-4 border-l-orange-500 cursor-pointer group">
+              <div className="bg-orange-50 w-14 h-14 rounded-xl flex items-center justify-center mb-4 text-orange-600">
                 <PenTool size={28} />
               </div>
-              <h2 className="text-xl font-bold text-white mb-2">Post Announcements</h2>
-              <p className="text-gray-300 text-sm mb-4">Create, edit, or delete public announcements for students.</p>
+              <h2 className="text-xl font-bold text-gray-900 mb-2">Post Announcements</h2>
+              <p className="text-gray-500 text-sm mb-4">Create, edit, or delete public announcements for students.</p>
               <button className="text-orange-600 font-semibold text-sm group-hover:text-orange-800 transition-colors">New Announcement &rarr;</button>
             </div>
 
@@ -216,18 +214,18 @@ export default function StaffDashboard() {
 
         {/* SEARCH STUDENT VIEW */}
         {activeView === 'search' && (
-          <div className="bg-white/10 backdrop-blur-[15px] rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.2)] border border-white/20 text-white p-6 sm:p-8 animate-fade-in max-w-3xl border-l-4 border-l-orange-500">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8 animate-fade-in max-w-3xl border-l-4 border-l-orange-500">
             <button 
               onClick={() => { setActiveView('dashboard'); setStudentData(null); setSearchId(''); }}
-              className="text-gray-300 hover:text-white font-medium mb-6 flex items-center transition-colors text-sm"
+              className="text-gray-500 hover:text-gray-800 font-medium mb-6 flex items-center transition-colors text-sm"
             >
               <ArrowLeft size={16} className="mr-2" /> Back to Dashboard
             </button>
             
-            <h2 className="text-2xl font-bold text-white mb-2 flex items-center">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2 flex items-center">
               <Search className="mr-3 text-orange-600" size={28} /> Search Student
             </h2>
-            <p className="text-gray-300 mb-6">Enter a Student ID to view and edit their records.</p>
+            <p className="text-gray-600 mb-6">Enter a Student ID to view and edit their records.</p>
             
             <div className="flex flex-col sm:flex-row gap-3 max-w-md mb-8">
               <input 
@@ -235,7 +233,7 @@ export default function StaffDashboard() {
                 value={searchId}
                 onChange={(e) => setSearchId(e.target.value)}
                 placeholder="e.g. 2025-151" 
-                className="flex-1 p-3 border border-white/20 bg-black/20 text-white rounded-lg outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+                className="flex-1 p-3 border border-gray-300 rounded-lg outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
               />
               <button 
                 onClick={handleSearch}
@@ -248,50 +246,50 @@ export default function StaffDashboard() {
             </div>
 
             {studentData && (
-              <div className="bg-orange-500/20/50 p-6 sm:p-8 rounded-xl border border-orange-100 animate-fade-in">
-                <h3 className="text-xl font-bold text-white border-b border-orange-200 pb-3 mb-4">Student Record Found</h3>
+              <div className="bg-orange-50/50 p-6 sm:p-8 rounded-xl border border-orange-100 animate-fade-in">
+                <h3 className="text-xl font-bold text-gray-800 border-b border-orange-200 pb-3 mb-4">Student Record Found</h3>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8 mb-6 text-sm sm:text-base">
                   <div>
-                    <span className="text-gray-300 block text-sm">Student ID</span>
-                    <strong className="text-white text-lg">{studentData.student_id}</strong>
+                    <span className="text-gray-500 block text-sm">Student ID</span>
+                    <strong className="text-gray-900 text-lg">{studentData.student_id}</strong>
                   </div>
                   <div>
-                    <span className="text-gray-300 block text-sm">Name</span>
-                    <strong className="text-white text-lg">{studentData.name || 'Not set'}</strong>
+                    <span className="text-gray-500 block text-sm">Name</span>
+                    <strong className="text-gray-900 text-lg">{studentData.name || 'Not set'}</strong>
                   </div>
                   <div>
-                    <span className="text-gray-300 block text-sm">Grade/Section</span>
-                    <strong className="text-white">{studentData.section || 'N/A'}</strong>
+                    <span className="text-gray-500 block text-sm">Grade/Section</span>
+                    <strong className="text-gray-900">{studentData.section || 'N/A'}</strong>
                   </div>
                   <div>
-                    <span className="text-gray-300 block text-sm">Contact</span>
-                    <strong className="text-white">{studentData.contact || 'No record'}</strong>
+                    <span className="text-gray-500 block text-sm">Contact</span>
+                    <strong className="text-gray-900">{studentData.contact || 'No record'}</strong>
                   </div>
                 </div>
 
-                <div className="bg-white p-4 sm:p-5 rounded-lg border border-white/20 shadow-sm mt-4">
-                  <h4 className="font-semibold text-gray-200 mb-4">Update Financial Status</h4>
+                <div className="bg-white p-4 sm:p-5 rounded-lg border border-gray-200 shadow-sm mt-4">
+                  <h4 className="font-semibold text-gray-700 mb-4">Update Financial Status</h4>
                   <div className="flex flex-col sm:flex-row gap-4">
                     <div className="flex-1">
-                      <label className="block text-sm text-gray-300 mb-1">Outstanding Balance (₱)</label>
+                      <label className="block text-sm text-gray-600 mb-1">Outstanding Balance (₱)</label>
                       <input 
                         type="number" 
                         id={`balance-${studentData.student_id}`}
                         defaultValue={studentData.balance || 0}
-                        className="w-full p-2.5 border border-white/20 bg-black/20 text-white rounded outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+                        className="w-full p-2.5 border border-gray-300 rounded outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
                       />
                     </div>
                     <div className="flex-1">
-                      <label className="block text-sm text-gray-300 mb-1">Status</label>
+                      <label className="block text-sm text-gray-600 mb-1">Status</label>
                       <select 
                         id={`status-${studentData.student_id}`}
                         defaultValue={studentData.status_val || 'Pending'}
-                        className="w-full p-2.5 border border-white/20 bg-black/20 text-white rounded outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+                        className="w-full p-2.5 border border-gray-300 rounded outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
                       >
-                        <option className="text-black" value="Pending">Pending</option>
-                        <option className="text-black" value="Paid">Paid</option>
-                        <option className="text-black" value="Unpaid">Unpaid</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Paid">Paid</option>
+                        <option value="Unpaid">Unpaid</option>
                       </select>
                     </div>
                   </div>
@@ -310,26 +308,26 @@ export default function StaffDashboard() {
 
         {/* ANNOUNCEMENTS VIEW */}
         {activeView === 'announcements' && (
-          <div className="bg-white/10 backdrop-blur-[15px] rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.2)] border border-white/20 text-white p-6 sm:p-8 animate-fade-in max-w-3xl border-l-4 border-l-orange-500">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8 animate-fade-in max-w-3xl border-l-4 border-l-orange-500">
             <button 
               onClick={() => setActiveView('dashboard')}
-              className="text-gray-300 hover:text-white font-medium mb-6 flex items-center transition-colors text-sm"
+              className="text-gray-500 hover:text-gray-800 font-medium mb-6 flex items-center transition-colors text-sm"
             >
               <ArrowLeft size={16} className="mr-2" /> Back to Dashboard
             </button>
             
-            <h2 className="text-2xl font-bold text-white mb-2 flex items-center">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2 flex items-center">
               <PenTool className="mr-3 text-orange-600" size={28} /> Post Announcement
             </h2>
-            <p className="text-gray-300 mb-6">Write an announcement below. It will instantly appear on the Student Portal feed.</p>
+            <p className="text-gray-600 mb-6">Write an announcement below. It will instantly appear on the Student Portal feed.</p>
             
             <div className="space-y-4">
-              <label className="block font-semibold text-white mb-1">Announcement Message:</label>
+              <label className="block font-semibold text-gray-800 mb-1">Announcement Message:</label>
               <textarea 
                 value={announcementMsg}
                 onChange={(e) => setAnnouncementMsg(e.target.value)}
                 placeholder="Type your message here..."
-                className="w-full h-40 p-4 border border-white/20 bg-black/20 text-white rounded-lg outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 resize-y"
+                className="w-full h-40 p-4 border border-gray-300 rounded-lg outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 resize-y"
               ></textarea>
               
               <button 

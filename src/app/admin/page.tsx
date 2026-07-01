@@ -144,19 +144,17 @@ export default function AdminDashboard() {
 
   if (!currentUser) {
     return (
-      <div className="min-h-screen bg-[#111] flex flex-col items-center justify-center font-sans">
-        <Loader2 className="animate-spin text-white w-12 h-12 mb-4" />
-        <p className="text-gray-300 font-medium">Loading portal...</p>
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center font-sans">
+        <Loader2 className="animate-spin text-blue-600 w-12 h-12 mb-4" />
+        <p className="text-gray-600 font-medium">Loading portal...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen font-sans relative overflow-x-hidden text-gray-100 flex flex-col">
-      <div className="fixed inset-0 bg-[url('/bghome.jpg')] bg-cover bg-center bg-fixed -z-10"></div>
-      <div className="fixed inset-0 bg-black/40 backdrop-blur-[2px] -z-10"></div>
+    <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
       {/* Navbar (The Blue Header) */}
-      <nav className="bg-white/10 backdrop-blur-md text-white shadow-[0_4px_30px_rgba(0,0,0,0.1)] border-b border-white/20 sticky top-0 z-50">
+      <nav className="bg-[#1d4ed8] text-white shadow-lg sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
@@ -183,31 +181,31 @@ export default function AdminDashboard() {
         {activeView === 'dashboard' && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
             
-            <div onClick={() => { setActiveView('users'); loadUsers(); }} className="bg-white/10 backdrop-blur-[15px] rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.2)] border border-white/20 text-white p-6 hover:shadow-md transition-shadow cursor-pointer group">
-              <div className="bg-blue-500/20 w-14 h-14 rounded-xl flex items-center justify-center mb-4 text-blue-600">
+            <div onClick={() => { setActiveView('users'); loadUsers(); }} className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer group">
+              <div className="bg-blue-50 w-14 h-14 rounded-xl flex items-center justify-center mb-4 text-blue-600">
                 <Users size={28} />
               </div>
-              <h2 className="text-xl font-bold text-white mb-2">User Management</h2>
-              <p className="text-gray-300 text-sm mb-4">View, edit, or remove student and staff accounts. Reset passwords.</p>
+              <h2 className="text-xl font-bold text-gray-900 mb-2">User Management</h2>
+              <p className="text-gray-500 text-sm mb-4">View, edit, or remove student and staff accounts. Reset passwords.</p>
               <button className="text-blue-600 font-semibold text-sm group-hover:text-blue-800 transition-colors">Manage Users &rarr;</button>
             </div>
 
-            <div onClick={() => setActiveView('announcements')} className="bg-white/10 backdrop-blur-[15px] rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.2)] border border-white/20 text-white p-6 hover:shadow-md transition-shadow cursor-pointer group">
-              <div className="bg-green-500/20 w-14 h-14 rounded-xl flex items-center justify-center mb-4 text-green-600">
+            <div onClick={() => setActiveView('announcements')} className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer group">
+              <div className="bg-green-50 w-14 h-14 rounded-xl flex items-center justify-center mb-4 text-green-600">
                 <Bullhorn size={28} />
               </div>
-              <h2 className="text-xl font-bold text-white mb-2">Global Announcements</h2>
-              <p className="text-gray-300 text-sm mb-4">Post important announcements and updates to all student and staff portals.</p>
+              <h2 className="text-xl font-bold text-gray-900 mb-2">Global Announcements</h2>
+              <p className="text-gray-500 text-sm mb-4">Post important announcements and updates to all student and staff portals.</p>
               <button className="text-green-600 font-semibold text-sm group-hover:text-green-800 transition-colors">Post Announcement &rarr;</button>
             </div>
 
-            <div onClick={() => setActiveView('settings')} className="bg-white/10 backdrop-blur-[15px] rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.2)] border border-white/20 text-white p-6 hover:shadow-md transition-shadow cursor-pointer group">
-              <div className="bg-gray-500/20 w-14 h-14 rounded-xl flex items-center justify-center mb-4 text-gray-300">
+            <div onClick={() => setActiveView('settings')} className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer group">
+              <div className="bg-gray-100 w-14 h-14 rounded-xl flex items-center justify-center mb-4 text-gray-600">
                 <Settings size={28} />
               </div>
-              <h2 className="text-xl font-bold text-white mb-2">System Settings</h2>
-              <p className="text-gray-300 text-sm mb-4">Configure global portal settings, maintenance mode, and logs.</p>
-              <button className="text-gray-300 font-semibold text-sm group-hover:text-white transition-colors">View Settings &rarr;</button>
+              <h2 className="text-xl font-bold text-gray-900 mb-2">System Settings</h2>
+              <p className="text-gray-500 text-sm mb-4">Configure global portal settings, maintenance mode, and logs.</p>
+              <button className="text-gray-600 font-semibold text-sm group-hover:text-gray-800 transition-colors">View Settings &rarr;</button>
             </div>
 
           </div>
@@ -215,26 +213,26 @@ export default function AdminDashboard() {
 
         {/* MANAGE USERS VIEW */}
         {activeView === 'users' && (
-          <div className="bg-white/10 backdrop-blur-[15px] rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.2)] border border-white/20 text-white p-6 sm:p-8 animate-fade-in">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8 animate-fade-in">
             <button 
               onClick={() => setActiveView('dashboard')}
-              className="text-gray-300 hover:text-white font-medium mb-6 flex items-center transition-colors text-sm"
+              className="text-gray-500 hover:text-gray-800 font-medium mb-6 flex items-center transition-colors text-sm"
             >
               <ArrowLeft size={16} className="mr-2" /> Back to Dashboard
             </button>
             
-            <h2 className="text-2xl font-bold text-white mb-2 flex items-center">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2 flex items-center">
               <Users className="mr-3 text-blue-600" size={28} /> Manage Users
             </h2>
-            <p className="text-gray-300 mb-6">Edit student balances and status below. Changes will save directly to your Google Sheet.</p>
+            <p className="text-gray-600 mb-6">Edit student balances and status below. Changes will save directly to your Google Sheet.</p>
             
             {isLoadingUsers ? (
               <p className="text-blue-600 italic flex items-center"><Loader2 className="animate-spin mr-2" size={16}/> Loading users securely from database...</p>
             ) : (
-              <div className="overflow-x-auto rounded-lg border border-white/20">
+              <div className="overflow-x-auto rounded-lg border border-gray-200">
                 <table className="w-full text-left border-collapse min-w-[800px]">
                   <thead>
-                    <tr className="bg-gray-50 text-gray-200">
+                    <tr className="bg-gray-50 text-gray-700">
                       <th className="p-3 font-semibold border-b">Student ID</th>
                       <th className="p-3 font-semibold border-b">Name</th>
                       <th className="p-3 font-semibold border-b">Contact #</th>
@@ -246,26 +244,26 @@ export default function AdminDashboard() {
                   </thead>
                   <tbody>
                     {users.map(user => (
-                      <tr key={user.student_id} id={`row-${user.student_id}`} className="border-b border-white/10 hover:bg-white/5">
-                        <td className="p-3 font-medium text-white">{user.student_id}</td>
-                        <td className="p-3 text-gray-300">{user.name || <i className="text-gray-400">Not set</i>}</td>
-                        <td className="p-3 text-gray-300">{user.contact || <i className="text-gray-400">No record</i>}</td>
-                        <td className="p-3 capitalize text-gray-300">{user.role}</td>
+                      <tr key={user.student_id} id={`row-${user.student_id}`} className="border-b border-gray-100 hover:bg-gray-50">
+                        <td className="p-3 font-medium text-gray-900">{user.student_id}</td>
+                        <td className="p-3 text-gray-600">{user.name || <i className="text-gray-400">Not set</i>}</td>
+                        <td className="p-3 text-gray-600">{user.contact || <i className="text-gray-400">No record</i>}</td>
+                        <td className="p-3 capitalize text-gray-600">{user.role}</td>
                         <td className="p-3">
                           <input 
                             type="number" 
-                            className="balance-input border border-white/20 bg-black/20 text-white rounded px-2 py-1.5 w-24 outline-none bg-transparent focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                            className="balance-input border border-gray-300 rounded px-2 py-1.5 w-24 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                             defaultValue={user.balance || 0}
                           />
                         </td>
                         <td className="p-3">
                           <select 
-                            className="status-select border border-white/20 bg-black/20 text-white rounded px-2 py-1.5 w-28 outline-none bg-transparent focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                            className="status-select border border-gray-300 rounded px-2 py-1.5 w-28 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                             defaultValue={user.status_val || 'Pending'}
                           >
-                            <option className="text-black" value="Pending">Pending</option>
-                            <option className="text-black" value="Paid">Paid</option>
-                            <option className="text-black" value="Unpaid">Unpaid</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Paid">Paid</option>
+                            <option value="Unpaid">Unpaid</option>
                           </select>
                         </td>
                         <td className="p-3">
@@ -280,7 +278,7 @@ export default function AdminDashboard() {
                     ))}
                     {users.length === 0 && (
                       <tr>
-                        <td colSpan={7} className="p-4 text-center text-gray-300">No students found.</td>
+                        <td colSpan={7} className="p-4 text-center text-gray-500">No students found.</td>
                       </tr>
                     )}
                   </tbody>
@@ -292,26 +290,26 @@ export default function AdminDashboard() {
 
         {/* ANNOUNCEMENTS VIEW */}
         {activeView === 'announcements' && (
-          <div className="bg-white/10 backdrop-blur-[15px] rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.2)] border border-white/20 text-white p-6 sm:p-8 animate-fade-in max-w-3xl">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8 animate-fade-in max-w-3xl">
             <button 
               onClick={() => setActiveView('dashboard')}
-              className="text-gray-300 hover:text-white font-medium mb-6 flex items-center transition-colors text-sm"
+              className="text-gray-500 hover:text-gray-800 font-medium mb-6 flex items-center transition-colors text-sm"
             >
               <ArrowLeft size={16} className="mr-2" /> Back to Dashboard
             </button>
             
-            <h2 className="text-2xl font-bold text-white mb-2 flex items-center">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2 flex items-center">
               <Bullhorn className="mr-3 text-green-600" size={28} /> Post Announcement
             </h2>
-            <p className="text-gray-300 mb-6">Write an announcement below. It will instantly appear on the Student Portal feed.</p>
+            <p className="text-gray-600 mb-6">Write an announcement below. It will instantly appear on the Student Portal feed.</p>
             
             <div className="space-y-4">
-              <label className="block font-semibold text-white mb-1">Announcement Message:</label>
+              <label className="block font-semibold text-gray-800 mb-1">Announcement Message:</label>
               <textarea 
                 value={announcementMsg}
                 onChange={(e) => setAnnouncementMsg(e.target.value)}
                 placeholder="Type your message here..."
-                className="w-full h-40 p-4 border border-white/20 bg-black/20 text-white rounded-lg outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 resize-y"
+                className="w-full h-40 p-4 border border-gray-300 rounded-lg outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 resize-y"
               ></textarea>
               
               <button 
@@ -334,25 +332,25 @@ export default function AdminDashboard() {
 
         {/* SETTINGS VIEW */}
         {activeView === 'settings' && (
-          <div className="bg-white/10 backdrop-blur-[15px] rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.2)] border border-white/20 text-white p-6 sm:p-8 animate-fade-in max-w-3xl">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8 animate-fade-in max-w-3xl">
             <button 
               onClick={() => setActiveView('dashboard')}
-              className="text-gray-300 hover:text-white font-medium mb-6 flex items-center transition-colors text-sm"
+              className="text-gray-500 hover:text-gray-800 font-medium mb-6 flex items-center transition-colors text-sm"
             >
               <ArrowLeft size={16} className="mr-2" /> Back to Dashboard
             </button>
             
-            <h2 className="text-2xl font-bold text-white mb-2 flex items-center">
-              <Settings className="mr-3 text-gray-300" size={28} /> System Settings
+            <h2 className="text-2xl font-bold text-gray-900 mb-2 flex items-center">
+              <Settings className="mr-3 text-gray-600" size={28} /> System Settings
             </h2>
-            <p className="text-gray-300 mb-6">Configure global portal options.</p>
+            <p className="text-gray-600 mb-6">Configure global portal options.</p>
             
             <div className="space-y-6">
               
               <div className="flex justify-between items-center py-4 border-b border-gray-100">
                 <div className="pr-4">
-                  <strong className="text-white block">Maintenance Mode</strong>
-                  <p className="text-sm text-gray-300 mt-1">Temporarily disable logins for all users except Admins.</p>
+                  <strong className="text-gray-800 block">Maintenance Mode</strong>
+                  <p className="text-sm text-gray-500 mt-1">Temporarily disable logins for all users except Admins.</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer flex-shrink-0">
                   <input type="checkbox" className="sr-only peer" />
@@ -362,8 +360,8 @@ export default function AdminDashboard() {
               
               <div className="flex justify-between items-center py-4 border-b border-gray-100">
                 <div className="pr-4">
-                  <strong className="text-white block">Allow Student Registration</strong>
-                  <p className="text-sm text-gray-300 mt-1">Allow new students to create an account from the login page.</p>
+                  <strong className="text-gray-800 block">Allow Student Registration</strong>
+                  <p className="text-sm text-gray-500 mt-1">Allow new students to create an account from the login page.</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer flex-shrink-0">
                   <input type="checkbox" className="sr-only peer" defaultChecked />
@@ -373,8 +371,8 @@ export default function AdminDashboard() {
               
               <div className="flex justify-between items-center py-4">
                 <div className="pr-4">
-                  <strong className="text-white block">Email Notifications</strong>
-                  <p className="text-sm text-gray-300 mt-1">Send automated emails when balances are updated.</p>
+                  <strong className="text-gray-800 block">Email Notifications</strong>
+                  <p className="text-sm text-gray-500 mt-1">Send automated emails when balances are updated.</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer flex-shrink-0">
                   <input type="checkbox" className="sr-only peer" />
