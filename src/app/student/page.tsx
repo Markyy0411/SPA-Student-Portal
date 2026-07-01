@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import useSWR from 'swr';
-import { LogOut, GraduationCap, IdCard, CalendarDays, Bell, FileText, Download, Moon, Sun, ArrowLeft, ReceiptText, Megaphone } from 'lucide-react';
+import { LogOut, GraduationCap, IdCard, CalendarDays, Bell, FileText, Download, Moon, Sun, ArrowLeft, ReceiptText, Megaphone, Edit3 } from 'lucide-react';
 import Swal from 'sweetalert2';
 
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz6cR-xROnKZME0Fu3CSxiyhYlt4gJgcxxx-Wu_DR9sT2d8H4mrPTtU4XM5GWXFjzfe/exec';
@@ -62,6 +62,44 @@ export default function StudentDashboard() {
   const handleLogout = () => {
     localStorage.removeItem('currentUser');
     router.push('/');
+  };
+
+  const handleEditContact = async () => {
+    const { value: newContact } = await Swal.fire({
+      title: 'Update Contact Info',
+      input: 'text',
+      inputLabel: 'Phone Number / Email',
+      inputValue: studentProfile.contact || '',
+      showCancelButton: true,
+      confirmButtonText: 'Save',
+      inputValidator: (value) => {
+        if (!value) return 'You need to enter contact information!';
+      }
+    });
+
+    if (newContact && newContact !== studentProfile.contact) {
+      Swal.fire({ title: 'Updating...', allowOutsideClick: false });
+      Swal.showLoading();
+      try {
+        const res = await fetch(GOOGLE_SCRIPT_URL, {
+          method: 'POST',
+          body: JSON.stringify({ 
+            action: 'update_contact', 
+            student_id: studentProfile.student_id, 
+            contact: newContact 
+          })
+        });
+        const result = await res.json();
+        if (result.status === 'success') {
+          Swal.fire('Success', 'Contact info updated!', 'success');
+          refreshProfile();
+        } else {
+          Swal.fire('Error', result.message, 'error');
+        }
+      } catch (error) {
+        Swal.fire('Error', 'Network error. Try again later.', 'error');
+      }
+    }
   };
 
   const handleDownload = (filename: string) => {
@@ -184,9 +222,18 @@ export default function StudentDashboard() {
                       <span className="text-gray-400">Role</span>
                       <span className="capitalize">{studentProfile.role}</span>
                     </div>
-                    <div className="flex justify-between border-b border-white/10 pb-2">
+                    <div className="flex justify-between items-center border-b border-white/10 pb-2">
                       <span className="text-gray-400">Contact</span>
-                      <span>{studentProfile.contact || 'N/A'}</span>
+                      <div className="flex items-center space-x-2">
+                        <span>{studentProfile.contact || 'N/A'}</span>
+                        <button 
+                          onClick={handleEditContact}
+                          className="p-1 bg-white/10 hover:bg-white/20 rounded transition-colors text-gray-300 hover:text-white"
+                          title="Edit Contact"
+                        >
+                          <Edit3 size={14} />
+                        </button>
+                      </div>
                     </div>
                     <div className="flex justify-between border-b border-white/10 pb-2">
                       <span className="text-gray-400">Status</span>

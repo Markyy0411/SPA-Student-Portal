@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import useSWR, { mutate } from 'swr';
-import { LogOut, Users, Settings, ShieldCheck, Megaphone, ArrowLeft, Moon, Sun, ReceiptText, UserCircle } from 'lucide-react';
+import { LogOut, Users, Settings, ShieldCheck, Megaphone, ArrowLeft, Moon, Sun, ReceiptText, UserCircle, Search, Filter, Download } from 'lucide-react';
 import Swal from 'sweetalert2';
 
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz6cR-xROnKZME0Fu3CSxiyhYlt4gJgcxxx-Wu_DR9sT2d8H4mrPTtU4XM5GWXFjzfe/exec';
@@ -30,6 +30,10 @@ export default function AdminDashboard() {
   const [isPosting, setIsPosting] = useState(false);
   const [postStatus, setPostStatus] = useState('');
   
+  // Search & Filter State
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('All');
+  
   // Settings State
   const [maintenanceMode, setMaintenanceMode] = useState(false);
   const [emailNotifications, setEmailNotifications] = useState(true);
@@ -49,7 +53,40 @@ export default function AdminDashboard() {
   );
   const announcements = announcementsData || [];
 
-  const users = usersData ? usersData.filter((u: any) => u.student_id && u.role !== 'admin' && u.role !== 'staff') : [];
+  const rawUsers = usersData ? usersData.filter((u: any) => u.student_id && u.role !== 'admin' && u.role !== 'staff') : [];
+  
+  const users = rawUsers.filter((u: any) => {
+    const matchesSearch = u.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          u.student_id?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesFilter = statusFilter === 'All' || u.status_val === statusFilter;
+    return matchesSearch && matchesFilter;
+  });
+
+  const exportToCSV = () => {
+    if (users.length === 0) {
+      Swal.fire('Empty', 'No users to export in the current view.', 'info');
+      return;
+    }
+    const headers = ['Student ID', 'Name', 'LRN', 'Balance', 'Status', 'Contact', 'Role'];
+    const rows = users.map((u: any) => [
+      u.student_id,
+      `"${u.name || ''}"`,
+      u.lrn || '',
+      u.balance || 0,
+      u.status_val || 'Pending',
+      `"${u.contact || ''}"`,
+      u.role || ''
+    ]);
+    
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows.map((r: any) => r.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `student_balances_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   useEffect(() => {
     const userStr = localStorage.getItem('currentUser');
@@ -321,6 +358,44 @@ export default function AdminDashboard() {
             </h2>
             <p className="text-gray-600 dark:text-gray-400 mb-6">Log payments or fees. This will update the balance and record the transaction.</p>
             
+            <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 space-y-4 md:space-y-0 md:space-x-4 bg-gray-50 dark:bg-gray-800/40 p-4 rounded-xl border border-gray-100 dark:border-gray-800">
+              <div className="relative flex-1">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Search className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Search by name or ID..."
+                  className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-[#111] focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+              
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2">
+                  <Filter className="h-5 w-5 text-gray-500" />
+                  <select
+                    className="border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-[#111] px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                  >
+                    <option value="All">All Statuses</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Paid">Paid</option>
+                    <option value="Unpaid">Unpaid</option>
+                  </select>
+                </div>
+                
+                <button
+                  onClick={exportToCSV}
+                  className="bg-gray-800 hover:bg-gray-900 dark:bg-gray-700 dark:hover:bg-gray-600 text-white px-4 py-2 rounded-lg flex items-center transition-colors shadow-sm"
+                >
+                  <Download size={18} className="mr-2" /> Export CSV
+                </button>
+              </div>
+            </div>
+
             {isLoadingUsers ? (
               <div className="space-y-4">
                 {[1, 2, 3, 4, 5].map(i => (
