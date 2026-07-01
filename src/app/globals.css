@@ -41,3 +41,30 @@ body {
   }
 }
 
+/* Custom SweetAlert2 Sizing (Small Rectangle Box) */
+.swal2-popup {
+  width: 22em !important;
+  padding: 1em !important;
+  border-radius: 12px !important;
+}
+.swal2-title {
+  font-size: 1.25rem !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+.swal2-icon {
+  transform: scale(0.65) !important;
+  margin: 0.5em auto 0.25em auto !important;
+}
+.swal2-html-container {
+  font-size: 0.95rem !important;
+  margin: 0.5em 0.5em 0 !important;
+}
+.swal2-actions {
+  margin-top: 1em !important;
+}
+.swal2-confirm, .swal2-cancel {
+  padding: 0.5em 1.2em !important;
+  font-size: 0.95rem !important;
+}
+
