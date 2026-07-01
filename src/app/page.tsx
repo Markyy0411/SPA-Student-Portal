@@ -96,15 +96,15 @@ export default function LoginPage() {
       if (data.status === 'success') {
         localStorage.setItem('currentUser', JSON.stringify({
           student_id: studentId,
-          role: data.role,
-          name: data.name,
-          balance: data.balance,
-          status_val: data.status_val,
-          lrn: data.lrn,
-          dob: data.dob,
-          age: data.age,
-          sex: data.sex,
-          contact: data.contact
+          role: data.user.role,
+          name: data.user.name,
+          balance: data.user.balance,
+          status_val: data.user.status_val,
+          lrn: data.user.lrn,
+          dob: data.user.dob,
+          age: data.user.age,
+          sex: data.user.sex,
+          contact: data.user.contact
         }));
 
         await Swal.fire({
@@ -115,8 +115,8 @@ export default function LoginPage() {
           showConfirmButton: false
         });
 
-        if (data.role === 'admin') router.push('/admin');
-        else if (data.role === 'staff') router.push('/staff');
+        if (data.user.role === 'admin') router.push('/admin');
+        else if (data.user.role === 'staff') router.push('/staff');
         else router.push('/student');
       } else {
         setErrorMsg(data.message || 'Incorrect Password');
