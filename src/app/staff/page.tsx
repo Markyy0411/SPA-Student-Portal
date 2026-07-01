@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import useSWR, { mutate } from 'swr';
-import { LogOut, ClipboardList, PenTool, ArrowLeft, Moon, Sun, Search, ReceiptText, Megaphone } from 'lucide-react';
+import { LogOut, Users, ClipboardList, Megaphone, ArrowLeft, Moon, Sun, ReceiptText, UserCircle } from 'lucide-react';
 import Swal from 'sweetalert2';
 
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz6cR-xROnKZME0Fu3CSxiyhYlt4gJgcxxx-Wu_DR9sT2d8H4mrPTtU4XM5GWXFjzfe/exec';
@@ -25,21 +25,26 @@ export default function StaffDashboard() {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [activeView, setActiveView] = useState('dashboard');
   
-  // Data states
-  const [searchInput, setSearchInput] = useState('');
-  const [searchId, setSearchId] = useState('');
+  // App State
   const [announcementMsg, setAnnouncementMsg] = useState('');
   const [isPosting, setIsPosting] = useState(false);
   const [postStatus, setPostStatus] = useState('');
 
-  // SWR Hook for searching a single student
-  const { data: searchResults, error: searchError, isLoading: isSearching } = useSWR(
-    (currentUser && activeView === 'students' && searchId) ? [GOOGLE_SCRIPT_URL, 'fetch_data', currentUser.role, searchId] : null,
+  // SWR Hooks
+  const { data: usersData, error: usersError, isLoading: isLoadingUsers } = useSWR(
+    (currentUser && activeView === 'users') ? [GOOGLE_SCRIPT_URL, 'fetch_data', currentUser.role, currentUser.student_id] : null,
     ([url, action, role, id]) => fetcher(url, action, role, id),
     { revalidateOnFocus: false }
   );
 
-  const studentData = (searchResults && searchResults.length > 0) ? searchResults.find((s: any) => s.student_id === searchId) : null;
+  const { data: announcementsData } = useSWR(
+    (currentUser && activeView === 'announcements') ? [GOOGLE_SCRIPT_URL, 'fetch_announcements', currentUser.role] : null,
+    ([url, action, role]) => fetcher(url, action, role),
+    { revalidateOnFocus: false }
+  );
+  const announcements = announcementsData || [];
+
+  const users = usersData ? usersData.filter((u: any) => u.student_id && u.role !== 'admin' && u.role !== 'staff') : [];
 
   useEffect(() => {
     const userStr = localStorage.getItem('currentUser');
@@ -55,14 +60,52 @@ export default function StaffDashboard() {
     }
   }, [router]);
 
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      if (event.state && event.state.view) {
+        setActiveView(event.state.view);
+      } else {
+        setActiveView('dashboard');
+      }
+    };
+    
+    // Initialize initial state if not present
+    window.history.replaceState({ view: 'dashboard' }, '', '');
+    
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  const changeView = (view: string) => {
+    window.history.pushState({ view }, '', `#${view}`);
+    setActiveView(view);
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('currentUser');
     router.push('/');
   };
 
-  const handleSearch = () => {
-    if (!searchInput.trim()) return;
-    setSearchId(searchInput.trim());
+  const viewProfile = (user: any) => {
+    Swal.fire({
+      title: 'Student Profile',
+      html: `
+        <div style="text-align: left; padding: 10px;">
+          <p><strong>Name:</strong> ${user.name || 'Not Set'}</p>
+          <p><strong>Student ID:</strong> ${user.student_id}</p>
+          <p><strong>LRN:</strong> ${user.lrn || 'Not Set'}</p>
+          <p><strong>Date of Birth:</strong> ${user.dob ? new Date(user.dob).toLocaleDateString() : 'Not Set'}</p>
+          <p><strong>Age:</strong> ${user.age || 'Not Set'}</p>
+          <p><strong>Sex:</strong> ${user.sex || 'Not Set'}</p>
+          <p><strong>Contact Number:</strong> ${user.contact || 'Not Set'}</p>
+          <hr style="margin: 10px 0; border-color: #ddd;">
+          <p><strong>Balance:</strong> ₱${user.balance || 0}</p>
+          <p><strong>Status:</strong> ${user.status_val || 'Pending'}</p>
+        </div>
+      `,
+      confirmButtonText: 'Close',
+      confirmButtonColor: '#1d4ed8'
+    });
   };
 
   const handleUpdateBalance = async (targetId: string, currentBalance: number, currentStatus: string) => {
@@ -94,7 +137,8 @@ export default function StaffDashboard() {
 
     const newBalance = Number(currentBalance) - Number(amount);
 
-    const statusSelect = document.getElementById(`status-${targetId}`) as HTMLSelectElement;
+    const row = document.getElementById(`row-${targetId}`);
+    const statusSelect = row?.querySelector('.status-select') as HTMLSelectElement;
     const newStatus = statusSelect ? statusSelect.value : currentStatus;
 
     try {
@@ -115,7 +159,7 @@ export default function StaffDashboard() {
       const result = await response.json();
       
       if (result.status === 'success') {
-        mutate([GOOGLE_SCRIPT_URL, 'fetch_data', currentUser.role, searchId]);
+        mutate([GOOGLE_SCRIPT_URL, 'fetch_data', currentUser.role, currentUser.student_id]);
         Swal.fire('Success', 'Transaction logged.', 'success');
 
         fetch('/api/send-email', {
@@ -225,47 +269,39 @@ export default function StaffDashboard() {
         {/* DASHBOARD GRID */}
         {activeView === 'dashboard' && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in max-w-4xl mx-auto">
-            
-            <div onClick={() => setActiveView('students')} className="bg-white dark:bg-[#111] rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 hover:shadow-md transition-shadow cursor-pointer group">
-              <div className="bg-orange-50 dark:bg-orange-900/30 w-14 h-14 rounded-xl flex items-center justify-center mb-4 text-orange-600 dark:text-orange-400">
-                <PenTool size={28} />
+            <div onClick={() => changeView('users')} className="bg-white dark:bg-[#111] rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 hover:shadow-md transition-shadow cursor-pointer group">
+              <div className="bg-blue-50 dark:bg-blue-900/30 w-14 h-14 rounded-xl flex items-center justify-center mb-4 text-blue-600 dark:text-blue-400">
+                <Users size={28} />
               </div>
-              <h2 className="text-xl font-bold mb-2">Student Records</h2>
-              <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">Search for a student to view their profile, update balances, and log transactions.</p>
-              <button className="text-orange-600 dark:text-orange-400 font-semibold text-sm group-hover:text-orange-800 transition-colors">Look up student &rarr;</button>
+              <h2 className="text-xl font-bold mb-2">User Management</h2>
+              <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">View students, log transactions, and edit status.</p>
+              <button className="text-blue-600 dark:text-blue-400 font-semibold text-sm group-hover:text-blue-800 transition-colors">Manage Users &rarr;</button>
             </div>
 
-            <div onClick={() => setActiveView('announcements')} className="bg-white dark:bg-[#111] rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 hover:shadow-md transition-shadow cursor-pointer group">
+            <div onClick={() => changeView('announcements')} className="bg-white dark:bg-[#111] rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 hover:shadow-md transition-shadow cursor-pointer group">
               <div className="bg-green-50 dark:bg-green-900/30 w-14 h-14 rounded-xl flex items-center justify-center mb-4 text-green-600 dark:text-green-400">
                 <Megaphone size={28} />
               </div>
-              <h2 className="text-xl font-bold mb-2">Announcements</h2>
-              <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">Post important announcements and updates to all portals.</p>
+              <h2 className="text-xl font-bold mb-2">Global Announcements</h2>
+              <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">Post important announcements and updates.</p>
               <button className="text-green-600 dark:text-green-400 font-semibold text-sm group-hover:text-green-800 transition-colors">Post Announcement &rarr;</button>
             </div>
-
           </div>
         )}
 
-        {/* STUDENTS VIEW */}
-        {activeView === 'students' && (
-          <div className="bg-white dark:bg-[#111] rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 sm:p-8 animate-fade-in max-w-4xl mx-auto">
+        {/* USERS VIEW */}
+        {activeView === 'users' && (
+          <div className="bg-white dark:bg-[#111] rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 sm:p-8 animate-fade-in">
             <button 
-              onClick={() => setActiveView('dashboard')}
+              onClick={() => changeView('dashboard')}
               className="text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white font-medium mb-6 flex items-center transition-colors text-sm"
             >
               <ArrowLeft size={16} className="mr-2" /> Back to Dashboard
             </button>
             
-            <h2 className="text-2xl font-bold mb-4 flex items-center">
-              <Search className="mr-3 text-orange-600 dark:text-orange-400" size={24} /> Student Lookup
+            <h2 className="text-2xl font-bold mb-2 flex items-center">
+              <Users className="mr-3 text-blue-600 dark:text-blue-400" size={28} /> Manage Users & Transactions
             </h2>
-            
-            <div className="flex space-x-2 mb-8">
-              <input 
-                type="text" 
-                placeholder="Enter Student ID (e.g. 2025-151)"
-                value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 className="flex-1 border border-gray-300 dark:border-gray-700 bg-transparent rounded-lg px-4 py-3 outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
@@ -335,39 +371,59 @@ export default function StaffDashboard() {
 
         {/* ANNOUNCEMENTS VIEW */}
         {activeView === 'announcements' && (
-          <div className="bg-white dark:bg-[#111] rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 sm:p-8 animate-fade-in max-w-3xl">
-            <button 
-              onClick={() => setActiveView('dashboard')}
-              className="text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white font-medium mb-6 flex items-center transition-colors text-sm"
-            >
-              <ArrowLeft size={16} className="mr-2" /> Back to Dashboard
-            </button>
-            
-            <h2 className="text-2xl font-bold mb-2 flex items-center">
-              <Megaphone className="mr-3 text-green-600 dark:text-green-400" size={28} /> Post Announcement
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">Write an announcement below. It will instantly appear on the Student Portal feed and email students.</p>
-            
-            <div className="space-y-4">
-              <textarea 
-                value={announcementMsg}
-                onChange={(e) => setAnnouncementMsg(e.target.value)}
-                placeholder="Type your message here..."
-                className="w-full h-40 p-4 border border-gray-300 dark:border-gray-700 bg-transparent rounded-lg outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 resize-y"
-              ></textarea>
-              
+          <div className="bg-white dark:bg-[#111] rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 sm:p-8 animate-fade-in max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
               <button 
-                onClick={handlePostAnnouncement}
-                disabled={isPosting}
-                className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center disabled:opacity-70 w-full sm:w-auto justify-center"
+                onClick={() => changeView('dashboard')}
+                className="text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white font-medium mb-6 flex items-center transition-colors text-sm"
               >
-                {isPosting ? 'Posting...' : 'Post & Email Students'}
+                <ArrowLeft size={16} className="mr-2" /> Back to Dashboard
               </button>
               
-              {postStatus && (
-                <p className={`mt-2 font-medium ${postStatus.includes('Error') ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
-                  {postStatus}
-                </p>
+              <h2 className="text-2xl font-bold mb-2 flex items-center">
+                <Megaphone className="mr-3 text-green-600 dark:text-green-400" size={28} /> Post Announcement
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400 mb-6">Write an announcement below. It will instantly appear on the Student Portal feed and email students.</p>
+              
+              <div className="space-y-4">
+                <textarea 
+                  value={announcementMsg}
+                  onChange={(e) => setAnnouncementMsg(e.target.value)}
+                  placeholder="Type your message here..."
+                  className="w-full h-40 p-4 border border-gray-300 dark:border-gray-700 bg-transparent rounded-lg outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 resize-y"
+                ></textarea>
+                
+                <button 
+                  onClick={handlePostAnnouncement}
+                  disabled={isPosting}
+                  className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center disabled:opacity-70 w-full sm:w-auto justify-center"
+                >
+                  {isPosting ? 'Posting...' : 'Post & Email Students'}
+                </button>
+                
+                {postStatus && (
+                  <p className={`mt-2 font-medium ${postStatus.includes('Error') ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
+                    {postStatus}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Past Announcements Feed */}
+            <div className="bg-gray-50 dark:bg-gray-800/40 rounded-xl p-6 border border-gray-100 dark:border-gray-800 h-full overflow-y-auto max-h-[600px]">
+              <h3 className="text-lg font-bold mb-4 flex items-center">Recent Announcements</h3>
+              {announcements.length === 0 ? (
+                <p className="text-gray-500 text-sm">No announcements posted yet.</p>
+              ) : (
+                <div className="space-y-4">
+                  {announcements.slice().reverse().map((ann: any, idx: number) => (
+                    <div key={idx} className="bg-white dark:bg-[#1a1a1a] p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                      <p className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-1">{ann.author}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">{new Date(ann.date).toLocaleString()}</p>
+                      <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{ann.message}</p>
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
           </div>

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import useSWR, { mutate } from 'swr';
-import { LogOut, Users, Settings, ShieldCheck, Megaphone, ArrowLeft, Moon, Sun, ReceiptText } from 'lucide-react';
+import { LogOut, Users, Settings, ShieldCheck, Megaphone, ArrowLeft, Moon, Sun, ReceiptText, UserCircle } from 'lucide-react';
 import Swal from 'sweetalert2';
 
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz6cR-xROnKZME0Fu3CSxiyhYlt4gJgcxxx-Wu_DR9sT2d8H4mrPTtU4XM5GWXFjzfe/exec';
@@ -30,6 +30,11 @@ export default function AdminDashboard() {
   const [isPosting, setIsPosting] = useState(false);
   const [postStatus, setPostStatus] = useState('');
   
+  // Settings State
+  const [maintenanceMode, setMaintenanceMode] = useState(false);
+  const [emailNotifications, setEmailNotifications] = useState(true);
+  const [allowProfileEdits, setAllowProfileEdits] = useState(false);
+
   // SWR Hooks
   const { data: usersData, error: usersError, isLoading: isLoadingUsers } = useSWR(
     (currentUser && activeView === 'users') ? [GOOGLE_SCRIPT_URL, 'fetch_data', currentUser.role, currentUser.student_id] : null,
@@ -37,7 +42,14 @@ export default function AdminDashboard() {
     { revalidateOnFocus: false }
   );
 
-  const users = usersData ? usersData.filter((u: any) => u.student_id && u.role === 'student') : [];
+  const { data: announcementsData } = useSWR(
+    (currentUser && activeView === 'announcements') ? [GOOGLE_SCRIPT_URL, 'fetch_announcements', currentUser.role] : null,
+    ([url, action, role]) => fetcher(url, action, role),
+    { revalidateOnFocus: false }
+  );
+  const announcements = announcementsData || [];
+
+  const users = usersData ? usersData.filter((u: any) => u.student_id && u.role !== 'admin' && u.role !== 'staff') : [];
 
   useEffect(() => {
     const userStr = localStorage.getItem('currentUser');
@@ -53,9 +65,52 @@ export default function AdminDashboard() {
     }
   }, [router]);
 
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      if (event.state && event.state.view) {
+        setActiveView(event.state.view);
+      } else {
+        setActiveView('dashboard');
+      }
+    };
+    
+    // Initialize initial state if not present
+    window.history.replaceState({ view: 'dashboard' }, '', '');
+    
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  const changeView = (view: string) => {
+    window.history.pushState({ view }, '', `#${view}`);
+    setActiveView(view);
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('currentUser');
     router.push('/');
+  };
+
+  const viewProfile = (user: any) => {
+    Swal.fire({
+      title: 'Student Profile',
+      html: `
+        <div style="text-align: left; padding: 10px;">
+          <p><strong>Name:</strong> ${user.name || 'Not Set'}</p>
+          <p><strong>Student ID:</strong> ${user.student_id}</p>
+          <p><strong>LRN:</strong> ${user.lrn || 'Not Set'}</p>
+          <p><strong>Date of Birth:</strong> ${user.dob ? new Date(user.dob).toLocaleDateString() : 'Not Set'}</p>
+          <p><strong>Age:</strong> ${user.age || 'Not Set'}</p>
+          <p><strong>Sex:</strong> ${user.sex || 'Not Set'}</p>
+          <p><strong>Contact Number:</strong> ${user.contact || 'Not Set'}</p>
+          <hr style="margin: 10px 0; border-color: #ddd;">
+          <p><strong>Balance:</strong> ₱${user.balance || 0}</p>
+          <p><strong>Status:</strong> ${user.status_val || 'Pending'}</p>
+        </div>
+      `,
+      confirmButtonText: 'Close',
+      confirmButtonColor: '#1d4ed8'
+    });
   };
 
   const handleUpdateBalance = async (targetId: string, currentBalance: number, currentStatus: string) => {
@@ -222,7 +277,7 @@ export default function AdminDashboard() {
         {/* DASHBOARD GRID */}
         {activeView === 'dashboard' && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
-            <div onClick={() => setActiveView('users')} className="bg-white dark:bg-[#111] rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 hover:shadow-md transition-shadow cursor-pointer group">
+            <div onClick={() => changeView('users')} className="bg-white dark:bg-[#111] rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 hover:shadow-md transition-shadow cursor-pointer group">
               <div className="bg-blue-50 dark:bg-blue-900/30 w-14 h-14 rounded-xl flex items-center justify-center mb-4 text-blue-600 dark:text-blue-400">
                 <Users size={28} />
               </div>
@@ -231,7 +286,7 @@ export default function AdminDashboard() {
               <button className="text-blue-600 dark:text-blue-400 font-semibold text-sm group-hover:text-blue-800 transition-colors">Manage Users &rarr;</button>
             </div>
 
-            <div onClick={() => setActiveView('announcements')} className="bg-white dark:bg-[#111] rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 hover:shadow-md transition-shadow cursor-pointer group">
+            <div onClick={() => changeView('announcements')} className="bg-white dark:bg-[#111] rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 hover:shadow-md transition-shadow cursor-pointer group">
               <div className="bg-green-50 dark:bg-green-900/30 w-14 h-14 rounded-xl flex items-center justify-center mb-4 text-green-600 dark:text-green-400">
                 <Megaphone size={28} />
               </div>
@@ -240,7 +295,7 @@ export default function AdminDashboard() {
               <button className="text-green-600 dark:text-green-400 font-semibold text-sm group-hover:text-green-800 transition-colors">Post Announcement &rarr;</button>
             </div>
 
-            <div onClick={() => setActiveView('settings')} className="bg-white dark:bg-[#111] rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 hover:shadow-md transition-shadow cursor-pointer group">
+            <div onClick={() => changeView('settings')} className="bg-white dark:bg-[#111] rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 hover:shadow-md transition-shadow cursor-pointer group">
               <div className="bg-gray-100 dark:bg-gray-800 w-14 h-14 rounded-xl flex items-center justify-center mb-4 text-gray-600 dark:text-gray-300">
                 <Settings size={28} />
               </div>
@@ -255,7 +310,7 @@ export default function AdminDashboard() {
         {activeView === 'users' && (
           <div className="bg-white dark:bg-[#111] rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 sm:p-8 animate-fade-in">
             <button 
-              onClick={() => setActiveView('dashboard')}
+              onClick={() => changeView('dashboard')}
               className="text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white font-medium mb-6 flex items-center transition-colors text-sm"
             >
               <ArrowLeft size={16} className="mr-2" /> Back to Dashboard
@@ -274,23 +329,21 @@ export default function AdminDashboard() {
               </div>
             ) : (
               <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-800">
-                <table className="w-full text-left border-collapse min-w-[800px]">
+                <table className="w-full text-left border-collapse min-w-[900px]">
                   <thead>
                     <tr className="bg-gray-50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300">
                       <th className="p-3 font-semibold border-b dark:border-gray-800">Student ID</th>
                       <th className="p-3 font-semibold border-b dark:border-gray-800">Name</th>
-                      <th className="p-3 font-semibold border-b dark:border-gray-800">Role</th>
                       <th className="p-3 font-semibold border-b dark:border-gray-800">Balance (₱)</th>
                       <th className="p-3 font-semibold border-b dark:border-gray-800">Status</th>
-                      <th className="p-3 font-semibold border-b dark:border-gray-800">Action</th>
+                      <th className="p-3 font-semibold border-b dark:border-gray-800 text-center">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {users.map((user: any) => (
                       <tr key={user.student_id} id={`row-${user.student_id}`} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors">
                         <td className="p-3 font-medium">{user.student_id}</td>
-                        <td className="p-3 text-gray-600 dark:text-gray-400">{user.name || <i className="opacity-50">Not set</i>}</td>
-                        <td className="p-3 capitalize text-gray-600 dark:text-gray-400">{user.role}</td>
+                        <td className="p-3 text-gray-600 dark:text-gray-400 font-medium">{user.name || <i className="opacity-50">Not set</i>}</td>
                         <td className="p-3 font-bold text-gray-800 dark:text-gray-200">
                           ₱{user.balance || 0}
                         </td>
@@ -305,15 +358,30 @@ export default function AdminDashboard() {
                           </select>
                         </td>
                         <td className="p-3">
-                          <button 
-                            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-1.5 px-4 rounded flex items-center transition-colors"
-                            onClick={() => handleUpdateBalance(user.student_id, user.balance, user.status_val)}
-                          >
-                            <ReceiptText size={16} className="mr-2" /> Log Tx
-                          </button>
+                          <div className="flex space-x-2 justify-center">
+                            <button 
+                              className="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white font-medium py-1.5 px-3 rounded flex items-center transition-colors text-sm"
+                              onClick={() => viewProfile(user)}
+                            >
+                              <UserCircle size={16} className="mr-1" /> Profile
+                            </button>
+                            <button 
+                              className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-1.5 px-3 rounded flex items-center transition-colors text-sm"
+                              onClick={() => handleUpdateBalance(user.student_id, user.balance, user.status_val)}
+                            >
+                              <ReceiptText size={16} className="mr-1" /> Log Tx
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
+                    {users.length === 0 && (
+                      <tr>
+                        <td colSpan={5} className="p-6 text-center text-gray-500 dark:text-gray-400">
+                          No users found. Make sure students have valid Student IDs.
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -323,40 +391,127 @@ export default function AdminDashboard() {
 
         {/* ANNOUNCEMENTS VIEW */}
         {activeView === 'announcements' && (
+          <div className="bg-white dark:bg-[#111] rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 sm:p-8 animate-fade-in max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+              <button 
+                onClick={() => changeView('dashboard')}
+                className="text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white font-medium mb-6 flex items-center transition-colors text-sm"
+              >
+                <ArrowLeft size={16} className="mr-2" /> Back to Dashboard
+              </button>
+              
+              <h2 className="text-2xl font-bold mb-2 flex items-center">
+                <Megaphone className="mr-3 text-green-600 dark:text-green-400" size={28} /> Post Announcement
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400 mb-6">Write an announcement below. It will instantly appear on the Student Portal feed and email students.</p>
+              
+              <div className="space-y-4">
+                <textarea 
+                  value={announcementMsg}
+                  onChange={(e) => setAnnouncementMsg(e.target.value)}
+                  placeholder="Type your message here..."
+                  className="w-full h-40 p-4 border border-gray-300 dark:border-gray-700 bg-transparent rounded-lg outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 resize-y"
+                ></textarea>
+                
+                <button 
+                  onClick={handlePostAnnouncement}
+                  disabled={isPosting}
+                  className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center disabled:opacity-70 w-full sm:w-auto justify-center"
+                >
+                  {isPosting ? 'Posting...' : 'Post & Email Students'}
+                </button>
+                
+                {postStatus && (
+                  <p className={`mt-2 font-medium ${postStatus.includes('Error') ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
+                    {postStatus}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Past Announcements Feed */}
+            <div className="bg-gray-50 dark:bg-gray-800/40 rounded-xl p-6 border border-gray-100 dark:border-gray-800 h-full overflow-y-auto max-h-[600px]">
+              <h3 className="text-lg font-bold mb-4 flex items-center">Recent Announcements</h3>
+              {announcements.length === 0 ? (
+                <p className="text-gray-500 text-sm">No announcements posted yet.</p>
+              ) : (
+                <div className="space-y-4">
+                  {announcements.slice().reverse().map((ann: any, idx: number) => (
+                    <div key={idx} className="bg-white dark:bg-[#1a1a1a] p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                      <p className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-1">{ann.author}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">{new Date(ann.date).toLocaleString()}</p>
+                      <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{ann.message}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* SETTINGS VIEW */}
+        {activeView === 'settings' && (
           <div className="bg-white dark:bg-[#111] rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 sm:p-8 animate-fade-in max-w-3xl">
             <button 
-              onClick={() => setActiveView('dashboard')}
+              onClick={() => changeView('dashboard')}
               className="text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white font-medium mb-6 flex items-center transition-colors text-sm"
             >
               <ArrowLeft size={16} className="mr-2" /> Back to Dashboard
             </button>
             
             <h2 className="text-2xl font-bold mb-2 flex items-center">
-              <Megaphone className="mr-3 text-green-600 dark:text-green-400" size={28} /> Post Announcement
+              <Settings className="mr-3 text-gray-600 dark:text-gray-300" size={28} /> System Settings
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">Write an announcement below. It will instantly appear on the Student Portal feed and email students.</p>
+            <p className="text-gray-600 dark:text-gray-400 mb-8">Manage global configurations for the Student Portal.</p>
             
-            <div className="space-y-4">
-              <textarea 
-                value={announcementMsg}
-                onChange={(e) => setAnnouncementMsg(e.target.value)}
-                placeholder="Type your message here..."
-                className="w-full h-40 p-4 border border-gray-300 dark:border-gray-700 bg-transparent rounded-lg outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 resize-y"
-              ></textarea>
+            <div className="space-y-6">
+              <div className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg">
+                <div>
+                  <h3 className="font-semibold text-lg">Maintenance Mode</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Lock the portal temporarily. Students will not be able to log in.</p>
+                </div>
+                <button 
+                  onClick={() => setMaintenanceMode(!maintenanceMode)}
+                  className={`w-12 h-6 rounded-full flex items-center transition-colors p-1 ${maintenanceMode ? 'bg-red-500' : 'bg-gray-300 dark:bg-gray-700'}`}
+                >
+                  <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform ${maintenanceMode ? 'translate-x-6' : 'translate-x-0'}`}></div>
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg">
+                <div>
+                  <h3 className="font-semibold text-lg">Email Notifications</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Automatically send emails when new announcements or transactions are logged.</p>
+                </div>
+                <button 
+                  onClick={() => setEmailNotifications(!emailNotifications)}
+                  className={`w-12 h-6 rounded-full flex items-center transition-colors p-1 ${emailNotifications ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-700'}`}
+                >
+                  <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform ${emailNotifications ? 'translate-x-6' : 'translate-x-0'}`}></div>
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg">
+                <div>
+                  <h3 className="font-semibold text-lg">Allow Profile Edits</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Permit students to update their own contact information from their dashboard.</p>
+                </div>
+                <button 
+                  onClick={() => setAllowProfileEdits(!allowProfileEdits)}
+                  className={`w-12 h-6 rounded-full flex items-center transition-colors p-1 ${allowProfileEdits ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-700'}`}
+                >
+                  <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform ${allowProfileEdits ? 'translate-x-6' : 'translate-x-0'}`}></div>
+                </button>
+              </div>
               
-              <button 
-                onClick={handlePostAnnouncement}
-                disabled={isPosting}
-                className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center disabled:opacity-70 w-full sm:w-auto justify-center"
-              >
-                {isPosting ? 'Posting...' : 'Post & Email Students'}
-              </button>
-              
-              {postStatus && (
-                <p className={`mt-2 font-medium ${postStatus.includes('Error') ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
-                  {postStatus}
-                </p>
-              )}
+              <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-800 flex justify-end">
+                <button 
+                  onClick={() => Swal.fire('Saved!', 'System settings have been updated successfully.', 'success')}
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded transition-colors"
+                >
+                  Save Changes
+                </button>
+              </div>
             </div>
           </div>
         )}

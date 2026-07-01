@@ -1,31 +1,27 @@
 const url = 'https://script.google.com/macros/s/AKfycbz6cR-xROnKZME0Fu3CSxiyhYlt4gJgcxxx-Wu_DR9sT2d8H4mrPTtU4XM5GWXFjzfe/exec';
 
 async function test() {
-  console.log("Testing verifyId with ADMIN-001...");
+  console.log("Testing fetch_data...");
   try {
-    const verifyRes = await fetch(url, {
+    const fetchRes = await fetch(url, {
       method: 'POST',
       body: JSON.stringify({
-        action: 'verifyId',
-        student_id: 'ADMIN-001'
+        action: 'fetch_data',
+        role: 'admin'
       })
     });
-    console.log("verifyId Status:", verifyRes.status);
-    const verifyText = await verifyRes.text();
-    console.log("verifyId Response:", verifyText);
+    const fetchText = await fetchRes.text();
+    console.log("fetch_data Response:", fetchText);
 
-    console.log("\nTesting login with ADMIN-001 / adminpass...");
-    const loginRes = await fetch(url, {
+    console.log("\nTesting fetch_announcements...");
+    const annRes = await fetch(url, {
       method: 'POST',
       body: JSON.stringify({
-        action: 'login',
-        student_id: 'ADMIN-001',
-        password: 'adminpass'
+        action: 'fetch_announcements'
       })
     });
-    console.log("login Status:", loginRes.status);
-    const loginText = await loginRes.text();
-    console.log("login Response:", loginText);
+    const annText = await annRes.text();
+    console.log("fetch_announcements Response:", annText);
 
   } catch (e) {
     console.error("Error:", e);
