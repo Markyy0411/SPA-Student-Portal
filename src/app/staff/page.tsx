@@ -302,68 +302,71 @@ export default function StaffDashboard() {
             <h2 className="text-2xl font-bold mb-2 flex items-center">
               <Users className="mr-3 text-blue-600 dark:text-blue-400" size={28} /> Manage Users & Transactions
             </h2>
-                onChange={(e) => setSearchInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                className="flex-1 border border-gray-300 dark:border-gray-700 bg-transparent rounded-lg px-4 py-3 outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
-              />
-              <button 
-                onClick={handleSearch}
-                disabled={isSearching}
-                className="bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center disabled:opacity-70"
-              >
-                {isSearching ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : 'Search'}
-              </button>
-            </div>
-
-            {searchId && !isSearching && !studentData && !searchError && (
-              <div className="p-6 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-xl border border-red-100 dark:border-red-900/30 text-center">
-                Student ID <b>{searchId}</b> not found in database.
+            <p className="text-gray-600 dark:text-gray-400 mb-6">Log payments or fees. This will update the balance and record the transaction.</p>
+            
+            {isLoadingUsers ? (
+              <div className="space-y-4">
+                {[1, 2, 3, 4, 5].map(i => (
+                  <div key={i} className="w-full h-12 bg-gray-200 dark:bg-gray-800 rounded animate-pulse"></div>
+                ))}
               </div>
-            )}
-
-            {isSearching && (
-              <div className="w-full h-40 bg-gray-100 dark:bg-gray-800 rounded-xl animate-pulse"></div>
-            )}
-
-            {studentData && !isSearching && (
-              <div className="bg-gray-50 dark:bg-gray-800/40 rounded-xl border border-gray-200 dark:border-gray-700 p-6 animate-fade-in">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white capitalize">{studentData.name || 'No Name Provided'}</h3>
-                    <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">ID: {studentData.student_id} • Contact: {studentData.contact || 'N/A'}</p>
-                  </div>
-                  <div className="mt-4 md:mt-0 bg-white dark:bg-[#111] px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm text-center">
-                    <span className="block text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold">Current Balance</span>
-                    <span className="block text-2xl font-bold text-orange-600 dark:text-orange-400">₱{studentData.balance || 0}</span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white dark:bg-[#111] p-5 rounded-lg border border-gray-200 dark:border-gray-700">
-                  
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Status</label>
-                    <select 
-                      id={`status-${studentData.student_id}`}
-                      className="w-full border border-gray-300 dark:border-gray-700 bg-transparent rounded-lg px-3 py-2 outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
-                      defaultValue={studentData.status_val || 'Pending'}
-                    >
-                      <option className="text-black" value="Pending">Pending</option>
-                      <option className="text-black" value="Paid">Paid</option>
-                      <option className="text-black" value="Unpaid">Unpaid</option>
-                    </select>
-                  </div>
-                  
-                  <div className="flex items-end">
-                    <button 
-                      id={`savebtn-${studentData.student_id}`}
-                      onClick={() => handleUpdateBalance(studentData.student_id, studentData.balance, studentData.status_val)}
-                      className="w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors shadow-sm flex items-center justify-center"
-                    >
-                      <ReceiptText size={18} className="mr-2" /> Log Transaction
-                    </button>
-                  </div>
-
-                </div>
+            ) : (
+              <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-800">
+                <table className="w-full text-left border-collapse min-w-[900px]">
+                  <thead>
+                    <tr className="bg-gray-50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300">
+                      <th className="p-3 font-semibold border-b dark:border-gray-800">Student ID</th>
+                      <th className="p-3 font-semibold border-b dark:border-gray-800">Name</th>
+                      <th className="p-3 font-semibold border-b dark:border-gray-800">Balance (₱)</th>
+                      <th className="p-3 font-semibold border-b dark:border-gray-800">Status</th>
+                      <th className="p-3 font-semibold border-b dark:border-gray-800 text-center">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {users.map((user: any) => (
+                      <tr key={user.student_id} id={`row-${user.student_id}`} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors">
+                        <td className="p-3 font-medium">{user.student_id}</td>
+                        <td className="p-3 text-gray-600 dark:text-gray-400 font-medium">{user.name || <i className="opacity-50">Not set</i>}</td>
+                        <td className="p-3 font-bold text-gray-800 dark:text-gray-200">
+                          ₱{user.balance || 0}
+                        </td>
+                        <td className="p-3">
+                          <select 
+                            className="status-select bg-transparent border border-gray-300 dark:border-gray-700 rounded px-2 py-1.5 w-28 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:text-white"
+                            defaultValue={user.status_val || 'Pending'}
+                          >
+                            <option className="text-black" value="Pending">Pending</option>
+                            <option className="text-black" value="Paid">Paid</option>
+                            <option className="text-black" value="Unpaid">Unpaid</option>
+                          </select>
+                        </td>
+                        <td className="p-3">
+                          <div className="flex space-x-2 justify-center">
+                            <button 
+                              className="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white font-medium py-1.5 px-3 rounded flex items-center transition-colors text-sm"
+                              onClick={() => viewProfile(user)}
+                            >
+                              <UserCircle size={16} className="mr-1" /> Profile
+                            </button>
+                            <button 
+                              className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-1.5 px-3 rounded flex items-center transition-colors text-sm"
+                              onClick={() => handleUpdateBalance(user.student_id, user.balance, user.status_val)}
+                            >
+                              <ReceiptText size={16} className="mr-1" /> Log Tx
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                    {users.length === 0 && (
+                      <tr>
+                        <td colSpan={5} className="p-6 text-center text-gray-500 dark:text-gray-400">
+                          No users found. Make sure students have valid Student IDs.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
               </div>
             )}
           </div>
